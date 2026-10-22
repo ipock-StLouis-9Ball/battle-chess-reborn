@@ -3,7 +3,7 @@
 *.translation
 *.import
 
-# Exported binaries
+# Exported binaries & packages
 export/
 bin/
 build/
@@ -13,8 +13,9 @@ build/
 *.pck
 *.dmg
 *.zip
+*.tpk
 
-# Mono / C# (if added in future)
+# Mono / C#
 .mono/
 data_*/
 mono_crash.*.json

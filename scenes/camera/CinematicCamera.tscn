@@ -1,0 +1,9 @@
+[gd_scene load_steps=2 format=3 uid="uid://cam_sc_001"]
+
+[ext_resource type="Script" path="res://scenes/camera/CinematicCamera.gd" id="1_cam"]
+
+[node name="CinematicCamera" type="Camera2D"]
+position = Vector2(960, 540)
+position_smoothing_enabled = true
+position_smoothing_speed = 7.0
+script = ExtResource("1_cam")

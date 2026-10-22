@@ -1,0 +1,104 @@
+[gd_scene load_steps=5 format=3 uid="uid://main_sc_001"]
+
+[ext_resource type="Script" path="res://scenes/ui/Main.gd" id="1_mview"]
+[ext_resource type="PackedScene" path="res://scenes/board/Board.tscn" id="2_board"]
+[ext_resource type="PackedScene" path="res://scenes/duel_arena/DuelArena.tscn" id="3_arena"]
+[ext_resource type="PackedScene" path="res://scenes/camera/CinematicCamera.tscn" id="4_cam"]
+
+[node name="Main" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_mview")
+
+[node name="Background" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.06, 0.07, 0.09, 1)
+
+[node name="CinematicCamera" parent="." instance=ExtResource("4_cam")]
+
+[node name="Board" parent="." instance=ExtResource("2_board")]
+layout_mode = 1
+
+[node name="DuelArena" parent="." instance=ExtResource("3_arena")]
+layout_mode = 1
+
+[node name="HUD" type="CanvasLayer" parent="."]
+
+[node name="TopBar" type="HBoxContainer" parent="HUD"]
+anchors_preset = 10
+anchor_right = 1.0
+offset_left = 30.0
+offset_top = 20.0
+offset_right = -30.0
+offset_bottom = 60.0
+grow_horizontal = 2
+theme_override_constants/separation = 30
+
+[node name="TurnLabel" type="Label" parent="HUD/TopBar"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 24
+text = "WHITE'S TURN (Turn 1)"
+
+[node name="WhiteClock" type="Label" parent="HUD/TopBar"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.9, 0.9, 1, 1)
+theme_override_font_sizes/font_size = 20
+text = "White: 10:00"
+
+[node name="BlackClock" type="Label" parent="HUD/TopBar"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.8, 0.8, 1)
+theme_override_font_sizes/font_size = 20
+text = "Black: 10:00"
+
+[node name="EloBadge" type="Label" parent="HUD/TopBar"]
+layout_mode = 2
+size_flags_horizontal = 10
+theme_override_font_sizes/font_size = 22
+text = "🎖️ Platinum II (1450 Elo)"
+
+[node name="BottomBar" type="HBoxContainer" parent="HUD"]
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 30.0
+offset_top = -60.0
+offset_right = -30.0
+offset_bottom = -20.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_constants/separation = 20
+
+[node name="PlatformLabel" type="Label" parent="HUD/BottomBar"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.65, 0.7, 0.8, 1)
+theme_override_font_sizes/font_size = 16
+text = "Steam PC Edition ($9.99)"
+
+[node name="ThemeLabel" type="Label" parent="HUD/BottomBar"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+text = "Themes:"
+
+[node name="ThemeHF" type="Button" parent="HUD/BottomBar"]
+layout_mode = 2
+text = "🏰 High Fantasy"
+
+[node name="ThemeCP" type="Button" parent="HUD/BottomBar"]
+layout_mode = 2
+text = "⚡ Cyberpunk"
+
+[node name="ThemeEL" type="Button" parent="HUD/BottomBar"]
+layout_mode = 2
+text = "🐙 Eldritch"

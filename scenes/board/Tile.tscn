@@ -1,0 +1,33 @@
+[gd_scene load_steps=2 format=3 uid="uid://tile_sc_001"]
+
+[ext_resource type="Script" path="res://scenes/board/Tile.gd" id="1_tile"]
+
+[node name="Tile" type="Control"]
+custom_minimum_size = Vector2(80, 80)
+layout_mode = 3
+anchors_preset = 0
+offset_right = 80.0
+offset_bottom = 80.0
+mouse_filter = 1
+script = ExtResource("1_tile")
+
+[node name="BG" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0.24, 0.28, 0.36, 1)
+
+[node name="Highlight" type="ColorRect" parent="."]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0.2, 0.75, 0.95, 0.4)
