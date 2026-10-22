@@ -48,9 +48,22 @@ func _connect_events() -> void:
 	btn_theme_cp.pressed.connect(func(): _switch_theme("cyberpunk"))
 	btn_theme_el.pressed.connect(func(): _switch_theme("eldritch"))
 
+	if has_node("/root/PlatformManager"):
+		var pm = get_node("/root/PlatformManager")
+		pm.full_game_unlock_changed.connect(func(_u): _update_platform_info())
+
 func _switch_theme(theme_name: String) -> void:
 	if has_node("/root/ThemeManager"):
-		get_node("/root/ThemeManager").set_theme(theme_name)
+		var tm = get_node("/root/ThemeManager")
+		var success = tm.set_theme(theme_name)
+		if not success and has_node("/root/PlatformManager"):
+			var pm = get_node("/root/PlatformManager")
+			if not pm.is_theme_unlocked(theme_name):
+				platform_label.text = "🔒 %s Theme locked! Unlock Full Game ($9.99)" % theme_name.capitalize()
+				platform_label.add_theme_color_override("font_color", Color(1.0, 0.4, 0.4))
+				var tw = create_tween()
+				tw.tween_interval(2.5)
+				tw.tween_callback(func(): _update_platform_info())
 	if has_node("/root/AudioManager"):
 		get_node("/root/AudioManager").play_sfx("click", "UI")
 

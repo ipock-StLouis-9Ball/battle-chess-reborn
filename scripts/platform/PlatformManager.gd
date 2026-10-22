@@ -1,11 +1,12 @@
 extends Node
 
 ## Platform Manager & Feature Flags
-## Manages Steam ($9.99 all-unlocked) vs Android ($4.99 Premium Pass) feature gates,
+## Manages Steam PC ($9.99 Upfront) and Mobile ($9.99 Full Game Unlock) unified monetization,
 ## Samsung Galaxy display safe-areas, high-refresh rates, and platform input routing.
 
 signal feature_flags_updated()
-signal premium_pass_status_changed(is_unlocked: bool)
+signal full_game_unlock_changed(is_unlocked: bool)
+signal premium_pass_status_changed(is_unlocked: bool) # Backward compatibility alias
 signal safe_area_changed(margins: Dictionary)
 
 enum TargetPlatform {
@@ -26,8 +27,13 @@ var device_refresh_rate: float = 60.0
 
 # Feature Flags
 var is_steam_edition: bool = false
-var has_premium_pass: bool = false # Android $4.99 IAP
+var has_full_game_unlock: bool = false # Unified $9.99 Mobile Full Game Unlock
+var has_premium_pass: bool:
+	get: return has_full_game_unlock
+	set(val): has_full_game_unlock = val
+
 var all_themes_unlocked: bool = false
+var all_duels_unlocked: bool = true # Capture duels active across all tiers
 var ranked_multiplayer_unlocked: bool = false
 var replay_theater_unlocked: bool = false
 var ad_free: bool = true
@@ -82,7 +88,7 @@ func _detect_display() -> void:
 func _load_license_data() -> void:
 	if is_steam_edition:
 		# Steam $9.99 model: full ownership upfront
-		has_premium_pass = true
+		has_full_game_unlock = true
 		return
 
 	# Android license check
@@ -91,61 +97,64 @@ func _load_license_data() -> void:
 		if file:
 			var parsed = JSON.parse_string(file.get_as_text())
 			if parsed is Dictionary:
-				has_premium_pass = parsed.get("has_premium_pass", false)
+				has_full_game_unlock = parsed.get("has_full_game_unlock", parsed.get("has_premium_pass", false))
 			file.close()
 
 func _save_license_data() -> void:
 	var file = FileAccess.open(SAVE_PATH, FileAccess.WRITE)
 	if file:
-		var data = {"has_premium_pass": has_premium_pass}
+		var data = {
+			"has_full_game_unlock": has_full_game_unlock,
+			"has_premium_pass": has_full_game_unlock
+		}
 		file.store_string(JSON.stringify(data))
 		file.close()
 
 func _apply_feature_flags() -> void:
-	if is_steam_edition:
-		# Steam ($9.99 Upfront) -> Everything unlocked
+	if is_steam_edition or has_full_game_unlock:
+		# Unified $9.99 Full Game: 100% Unlocked across Steam PC & Mobile
 		all_themes_unlocked = true
+		all_duels_unlocked = true
 		ranked_multiplayer_unlocked = true
 		replay_theater_unlocked = true
 		ad_free = true
-		steam_achievements_enabled = true
+		steam_achievements_enabled = is_steam_edition
 	else:
-		# Android Freemium + $4.99 Premium Pass
-		if has_premium_pass:
-			all_themes_unlocked = true
-			ranked_multiplayer_unlocked = true
-			replay_theater_unlocked = true
-			ad_free = true
-		else:
-			# Free Android Tier: High Fantasy unlocked, Cyberpunk & Eldritch locked
-			all_themes_unlocked = false
-			ranked_multiplayer_unlocked = false
-			replay_theater_unlocked = false
-			ad_free = false
+		# Free Mobile Trial Tier: High Fantasy unlocked, Cyberpunk & Eldritch locked
+		all_themes_unlocked = false
+		all_duels_unlocked = true
+		ranked_multiplayer_unlocked = false
+		replay_theater_unlocked = false
+		ad_free = false
 		steam_achievements_enabled = false
 
 	feature_flags_updated.emit()
 
-## Unlock Android $4.99 Premium Pass
-func purchase_premium_pass() -> void:
-	has_premium_pass = true
+## Unlock Mobile $9.99 Unified 'Full Game Unlock'
+func purchase_full_game() -> void:
+	has_full_game_unlock = true
 	_save_license_data()
 	_apply_feature_flags()
+	full_game_unlock_changed.emit(true)
 	premium_pass_status_changed.emit(true)
+
+## Backward compatibility alias
+func purchase_premium_pass() -> void:
+	purchase_full_game()
 
 func is_theme_unlocked(theme_name: String) -> bool:
 	if all_themes_unlocked or is_steam_edition:
 		return true
-	# In free Android tier, only High Fantasy is available
+	# In free mobile trial tier, only High Fantasy is available
 	return theme_name.to_lower() == "high_fantasy"
 
 func get_store_pricing_label() -> String:
 	if is_steam_edition:
-		return "Steam PC Edition - $9.99 (All Themes & Features Unlocked)"
-	elif has_premium_pass:
-		return "Android Premium Pass - Unlocked"
+		return "Steam PC Edition - $9.99 (Full Game Unlocked)"
+	elif has_full_game_unlock:
+		return "Mobile Edition - Full Game Unlocked ($9.99)"
 	else:
-		return "Android Free Tier (Unlock All Themes & Ranked for $4.99)"
+		return "Free Trial (Full Game Unlock: $9.99 - All Themes & Ranked)"
 
 func get_safe_area_margins() -> Dictionary:
 	var screen_size = DisplayServer.screen_get_size()
