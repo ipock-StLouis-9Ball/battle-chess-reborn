@@ -24,8 +24,6 @@ grow_horizontal = 2
 grow_vertical = 2
 color = Color(0.06, 0.07, 0.09, 1)
 
-[node name="CinematicCamera" parent="." instance=ExtResource("4_cam")]
-
 [node name="Board3DContainer" type="SubViewportContainer" parent="."]
 visible = false
 layout_mode = 1
@@ -39,9 +37,12 @@ stretch = true
 [node name="SubViewport" type="SubViewport" parent="Board3DContainer"]
 handle_input_locally = false
 size = Vector2i(1920, 1080)
-render_target_update_mode = 0
+size_2d_override_stretch = true
+render_target_update_mode = 4
 
 [node name="Board3D" parent="Board3DContainer/SubViewport" instance=ExtResource("5_b3d")]
+
+[node name="CinematicCamera" parent="Board3DContainer/SubViewport" instance=ExtResource("4_cam")]
 
 [node name="Board2D" parent="." instance=ExtResource("2_board")]
 layout_mode = 1

@@ -8,7 +8,8 @@ extends Control
 @onready var board_3d_container: SubViewportContainer = $Board3DContainer
 @onready var board_3d: Board3D = $Board3DContainer/SubViewport/Board3D
 @onready var duel_arena_view: DuelArenaView = $DuelArena
-@onready var camera_2d: CinematicCamera = $CinematicCamera
+@onready var camera: CinematicCamera = $Board3DContainer/SubViewport/CinematicCamera
+@onready var camera_2d: CinematicCamera = camera
 
 # HUD elements
 @onready var turn_label: Label = $HUD/TopBar/TurnLabel
