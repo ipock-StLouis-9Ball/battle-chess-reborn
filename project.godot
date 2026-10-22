@@ -18,7 +18,7 @@ config/icon="res://assets/icons/app_icon.png"
 [autoload]
 
 EventBus="*res://src/autoload/event_bus.gd"
-PlatformManager="*res://scripts/platform/PlatformManager.gd"
+PlatformManager="*res://src/autoload/platform_manager.gd"
 SettingsManager="*res://src/autoload/settings_manager.gd"
 SaveManager="*res://src/autoload/save_manager.gd"
 AudioManager="*res://src/autoload/audio_manager.gd"
