@@ -1,4 +1,3 @@
-class_name DuelDirector
 extends Node
 
 ## Duel Director

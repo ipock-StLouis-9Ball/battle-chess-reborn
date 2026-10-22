@@ -1,4 +1,3 @@
-class_name ThemeManager
 extends Node
 
 ## Theme Manager

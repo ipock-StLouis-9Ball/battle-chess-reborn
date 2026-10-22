@@ -1,4 +1,3 @@
-class_name EloCalculator
 extends Node
 
 ## Ranked Elo Rating Math & Division Tier System

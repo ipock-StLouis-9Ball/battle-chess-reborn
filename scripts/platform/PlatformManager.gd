@@ -1,4 +1,3 @@
-class_name PlatformManager
 extends Node
 
 ## Platform Manager & Feature Flags
