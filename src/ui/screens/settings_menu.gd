@@ -120,14 +120,32 @@ func _connect_signals() -> void:
 	btn_back.pressed.connect(_on_back_pressed)
 
 func _display_device_info() -> void:
-	var safe = PlatformManager.get_safe_area()
+	var safe = Rect2i()
+	var model = "Desktop / Standard"
+	var hz = 60.0
+	var vendor = ""
+	var form = ""
+	if has_node("/root/PlatformManager"):
+		var pm = get_node("/root/PlatformManager")
+		safe = pm.get_safe_area()
+		model = pm.device_model if pm.device_model != "" else "Standard"
+		hz = pm.device_refresh_rate
+		if pm.has_method("get_device_summary"):
+			var summary = pm.get_device_summary()
+			vendor = summary.get("vendor", "")
+			form = summary.get("form_factor", "")
+
+	var prefix = ("%s %s" % [vendor, form]).strip_edges()
+	if prefix.is_empty():
+		prefix = OS.get_name()
 	var info = "Device: %s | Model: %s | Refresh: %.0f Hz\nSafe Area: %s" % [
-		OS.get_name(),
-		PlatformManager.device_model if PlatformManager.device_model != "" else "Desktop / Standard",
-		PlatformManager.device_refresh_rate,
+		prefix,
+		model,
+		hz,
 		str(safe)
 	]
-	device_info_label.text = info
+	if is_instance_valid(device_info_label):
+		device_info_label.text = info
 
 func _on_back_pressed() -> void:
 	EventBus.play_sfx_requested.emit("click", "UI")

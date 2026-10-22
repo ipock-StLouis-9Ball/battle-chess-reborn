@@ -22,16 +22,42 @@ var active_tween: Tween
 
 func _ready() -> void:
 	current = true
+	_update_adaptive_fov()
 	fov = base_fov
 	position = base_pos
 	rotation_degrees = base_rot
 	make_current()
+
+	var vp = get_viewport()
+	if is_instance_valid(vp):
+		vp.size_changed.connect(_on_viewport_resized)
 
 	if has_node("/root/DuelDirector"):
 		var dd = get_node("/root/DuelDirector")
 		dd.camera_framing_requested.connect(_on_framing_requested)
 		dd.duel_impact_hit.connect(_on_duel_impact)
 		dd.duel_completed.connect(_on_duel_completed)
+
+func _on_viewport_resized() -> void:
+	_update_adaptive_fov()
+	if not is_in_duel:
+		fov = base_fov
+
+func _update_adaptive_fov() -> void:
+	var vp = get_viewport()
+	if not is_instance_valid(vp):
+		return
+	var vp_size = vp.get_visible_rect().size
+	if vp_size.x <= 0 or vp_size.y <= 0:
+		return
+	var aspect = vp_size.x / vp_size.y
+	# Standard landscape is 16:9 (~1.778). On tablets (4:3 = 1.33, 16:10 = 1.6) or foldables (~1.0),
+	# adapt FOV so the 20m board and plinth staging are framed perfectly without horizontal cropping.
+	if aspect < 1.7:
+		var factor = 1.7778 / aspect
+		base_fov = clampf(35.0 * factor, 35.0, 50.0)
+	else:
+		base_fov = 35.0
 
 ## Calculate and restore stationary heroic overview framing
 func reset_to_heroic_overview(duration: float = 0.5) -> void:

@@ -1,8 +1,8 @@
 class_name SafeAreaContainer
 extends MarginContainer
 
-## Responsive container adjusting margins for Samsung Galaxy notch/camera cutouts
-## and system navigation insets.
+## Responsive container adjusting margins for universal mobile notches, punch-holes,
+## dynamic islands, camera cutouts, and navigation insets across all iOS and Android devices.
 
 @export var apply_left: bool = true
 @export var apply_right: bool = true
@@ -13,11 +13,18 @@ extends MarginContainer
 
 func _ready() -> void:
 	_update_margins()
-	EventBus.safe_area_changed.connect(func(_rect): _update_margins())
-	get_viewport().size_changed.connect(_update_margins)
+	if has_node("/root/EventBus"):
+		get_node("/root/EventBus").safe_area_changed.connect(func(_rect): _update_margins())
+	if has_node("/root/PlatformManager"):
+		get_node("/root/PlatformManager").safe_area_changed.connect(func(_margins): _update_margins())
+	var vp = get_viewport()
+	if is_instance_valid(vp):
+		vp.size_changed.connect(_update_margins)
 
 func _update_margins() -> void:
-	var margins = PlatformManager.get_safe_area_margins()
+	var margins = {"left": 0, "top": 0, "right": 0, "bottom": 0}
+	if has_node("/root/PlatformManager"):
+		margins = get_node("/root/PlatformManager").get_safe_area_margins()
 	
 	var ml = (margins.left + extra_padding) if apply_left else extra_padding
 	var mr = (margins.right + extra_padding) if apply_right else extra_padding
