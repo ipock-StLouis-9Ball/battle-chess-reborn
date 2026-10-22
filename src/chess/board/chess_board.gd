@@ -12,7 +12,7 @@ const TILE_PIXEL_SIZE = 84.0
 @export var tile_scene: PackedScene = preload("res://src/chess/board/board_tile.tscn")
 @export var piece_scene: PackedScene = preload("res://src/chess/pieces/piece_view.tscn")
 
-var engine: ChessEngine = ChessEngine.new()
+var engine: ChessEngine = null
 
 var _tiles: Dictionary = {} # Vector2i -> BoardTile
 var _piece_views: Dictionary = {} # ChessPieceData -> PieceView
@@ -26,13 +26,17 @@ var is_busy_animating: bool = false
 @onready var board_frame: PanelContainer = $BoardFrame
 
 func _ready() -> void:
+	if engine == null:
+		engine = ChessEngine.new()
 	_init_board_tiles()
 	_connect_events()
 	start_fresh_game()
 
 func _connect_events() -> void:
-	EventBus.duel_completed.connect(_on_duel_completed)
-	EventBus.turn_changed.connect(_on_turn_changed)
+	if has_node("/root/EventBus"):
+		var eb = get_node("/root/EventBus")
+		eb.duel_completed.connect(_on_duel_completed)
+		eb.turn_changed.connect(_on_turn_changed)
 
 func start_fresh_game() -> void:
 	_clear_all_pieces()
@@ -120,9 +124,11 @@ func _select_piece(pos: Vector2i, piece: ChessPieceData) -> void:
 			else:
 				_tiles[m.to_pos].set_highlight_move(true)
 
-	PlatformManager.trigger_haptic(25)
-	EventBus.tile_selected.emit(pos, piece)
-	EventBus.valid_moves_updated.emit(current_legal_moves)
+	if has_node("/root/PlatformManager"):
+		get_node("/root/PlatformManager").trigger_haptic(25)
+	if has_node("/root/EventBus"):
+		get_node("/root/EventBus").tile_selected.emit(pos, piece)
+		get_node("/root/EventBus").valid_moves_updated.emit(current_legal_moves)
 
 func clear_selection() -> void:
 	if selected_pos != Vector2i(-1, -1) and _tiles.has(selected_pos):
@@ -135,7 +141,8 @@ func clear_selection() -> void:
 
 	selected_pos = Vector2i(-1, -1)
 	current_legal_moves.clear()
-	EventBus.selection_cleared.emit()
+	if has_node("/root/EventBus"):
+		get_node("/root/EventBus").selection_cleared.emit()
 
 func _execute_move(move: ChessMove) -> void:
 	clear_selection()
@@ -146,15 +153,17 @@ func _execute_move(move: ChessMove) -> void:
 	if move.is_attack:
 		# Attack initiated -> Start Combat Chess Duel!
 		var defender_piece = engine.get_piece_at(move.to_pos)
-		Logger.info("ChessBoard", "Duel engaged! %s (%s) attacks %s (%s) at %s" % [
+		print("[ChessBoard] Duel engaged! %s (%s) attacks %s (%s) at %s" % [
 			MathHelpers.piece_type_to_name(attacker_piece.type),
 			MathHelpers.color_to_name(attacker_piece.color),
 			MathHelpers.piece_type_to_name(defender_piece.type),
 			MathHelpers.color_to_name(defender_piece.color),
 			MathHelpers.grid_to_algebraic(move.to_pos)
 		])
-		EventBus.move_executed.emit(move.from_pos, move.to_pos, true)
-		GameManager.start_duel(attacker_piece, defender_piece, move.to_pos)
+		if has_node("/root/EventBus"):
+			get_node("/root/EventBus").move_executed.emit(move.from_pos, move.to_pos, true)
+		if has_node("/root/GameManager"):
+			get_node("/root/GameManager").start_duel(attacker_piece, defender_piece, move.to_pos)
 	else:
 		# Standard peaceful move or castling
 		is_busy_animating = true

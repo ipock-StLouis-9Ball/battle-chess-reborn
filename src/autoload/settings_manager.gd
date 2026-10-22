@@ -16,7 +16,7 @@ var combat_volume: float = 0.9
 var target_fps: int = 60
 var vsync_enabled: bool = true
 var fullscreen: bool = false
-var graphics_preset: GameEnums.GraphicsPreset = GameEnums.GraphicsPreset.HIGH
+var graphics_preset: int = 2 # GameEnums.GraphicsPreset.HIGH
 var screen_shake: bool = true
 
 # Mobile / Touch Specifics
@@ -26,7 +26,7 @@ var haptics_enabled: bool = true
 
 # Gameplay
 var auto_resolve_duels: bool = false
-var ai_duel_difficulty: GameEnums.AIDifficulty = GameEnums.AIDifficulty.MEDIUM
+var ai_duel_difficulty: int = 1 # GameEnums.AIDifficulty.MEDIUM
 
 var _config: ConfigFile = ConfigFile.new()
 
@@ -34,10 +34,17 @@ func _ready() -> void:
 	load_settings()
 	apply_all_settings()
 
+func _is_platform_mobile() -> bool:
+	if has_node("/root/PlatformManager"):
+		var pm = get_node("/root/PlatformManager")
+		if pm.has_method("is_mobile"):
+			return pm.is_mobile()
+	return OS.get_name() == "Android" or OS.get_name() == "iOS"
+
 func load_settings() -> void:
 	var err = _config.load(SETTINGS_FILE_PATH)
 	if err != OK:
-		Logger.info("Settings", "No existing settings found, initializing platform defaults")
+		print("[Settings] No existing settings found, initializing platform defaults")
 		_init_platform_defaults()
 		save_settings()
 		return
@@ -53,20 +60,21 @@ func load_settings() -> void:
 	target_fps = _config.get_value("display", "target_fps", 60)
 	vsync_enabled = _config.get_value("display", "vsync_enabled", true)
 	fullscreen = _config.get_value("display", "fullscreen", false)
-	graphics_preset = _config.get_value("display", "graphics_preset", GameEnums.GraphicsPreset.HIGH)
+	graphics_preset = _config.get_value("display", "graphics_preset", 2)
 	screen_shake = _config.get_value("display", "screen_shake", true)
 
 	# Load Mobile / Touch
-	show_touch_controls = _config.get_value("mobile", "show_touch_controls", PlatformManager.is_mobile())
+	show_touch_controls = _config.get_value("mobile", "show_touch_controls", _is_platform_mobile())
 	touch_controls_opacity = _config.get_value("mobile", "touch_controls_opacity", 0.85)
 	haptics_enabled = _config.get_value("mobile", "haptics_enabled", true)
 
 	# Load Gameplay
 	auto_resolve_duels = _config.get_value("gameplay", "auto_resolve_duels", false)
-	ai_duel_difficulty = _config.get_value("gameplay", "ai_duel_difficulty", GameEnums.AIDifficulty.MEDIUM)
+	ai_duel_difficulty = _config.get_value("gameplay", "ai_duel_difficulty", 1)
 
-	Logger.info("Settings", "Settings loaded successfully")
-	EventBus.settings_loaded.emit()
+	print("[Settings] Settings loaded successfully")
+	if has_node("/root/EventBus"):
+		get_node("/root/EventBus").settings_loaded.emit()
 
 func save_settings() -> void:
 	# Audio
@@ -93,16 +101,20 @@ func save_settings() -> void:
 	_config.set_value("gameplay", "ai_duel_difficulty", ai_duel_difficulty)
 
 	_config.save(SETTINGS_FILE_PATH)
-	Logger.info("Settings", "Settings persisted to disk")
-	EventBus.settings_saved.emit()
+	print("[Settings] Settings persisted to disk")
+	if has_node("/root/EventBus"):
+		get_node("/root/EventBus").settings_saved.emit()
 
 func _init_platform_defaults() -> void:
-	if PlatformManager.is_mobile():
+	if _is_platform_mobile():
 		show_touch_controls = true
 		haptics_enabled = true
 		fullscreen = true
 		# Default to matching device refresh rate (e.g. 120 or 60)
-		target_fps = int(PlatformManager.device_refresh_rate)
+		var refresh: float = 60.0
+		if has_node("/root/PlatformManager"):
+			refresh = get_node("/root/PlatformManager").get("device_refresh_rate")
+		target_fps = int(refresh)
 	else:
 		show_touch_controls = false
 		haptics_enabled = false
@@ -136,7 +148,7 @@ func _apply_display() -> void:
 		DisplayServer.VSYNC_ENABLED if vsync_enabled else DisplayServer.VSYNC_DISABLED
 	)
 	
-	if not PlatformManager.is_mobile():
+	if not _is_platform_mobile():
 		var mode = DisplayServer.WINDOW_MODE_FULLSCREEN if fullscreen else DisplayServer.WINDOW_MODE_WINDOWED
 		DisplayServer.window_set_mode(mode)
 

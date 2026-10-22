@@ -87,7 +87,7 @@ func _on_duel_triggered(attacker: Dictionary, victim: Dictionary, board_pos: Vec
 	if has_node("/root/DuelDirector"):
 		get_node("/root/DuelDirector").start_cinematic_duel(attacker, victim, world_pos)
 
-func _on_theme_swapped(_theme_id: String, _piece_theme: PieceTheme) -> void:
+func _on_theme_swapped(_theme_id: String, _piece_theme: Resource) -> void:
 	_refresh_board_theme()
 	_sync_pieces()
 

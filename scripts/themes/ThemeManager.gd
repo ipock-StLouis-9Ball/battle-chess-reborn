@@ -4,7 +4,7 @@ extends Node
 ## Manages High Fantasy, Cyberpunk, and Eldritch visual styles, palettes, and piece models
 
 signal theme_changed(new_theme: String, theme_data: Dictionary)
-signal piece_theme_changed(theme_resource: PieceTheme)
+signal piece_theme_changed(theme_resource: Resource)
 
 const THEME_RESOURCE_PATHS = {
 	"high_fantasy": "res://themes/high_fantasy/high_fantasy.tres",
@@ -76,7 +76,7 @@ func set_theme(theme_id: String) -> bool:
 	piece_theme_changed.emit(piece_theme)
 	return true
 
-func get_piece_theme(theme_id: String = "") -> PieceTheme:
+func get_piece_theme(theme_id: String = "") -> Resource:
 	var tid = theme_id.to_lower() if not theme_id.is_empty() else current_theme
 	if cached_piece_themes.has(tid):
 		return cached_piece_themes[tid]
@@ -91,7 +91,7 @@ func get_piece_theme(theme_id: String = "") -> PieceTheme:
 
 	return null
 
-func get_current_piece_theme() -> PieceTheme:
+func get_current_piece_theme() -> Resource:
 	return get_piece_theme(current_theme)
 
 func get_current_theme_data() -> Dictionary:

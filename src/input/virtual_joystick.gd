@@ -14,19 +14,32 @@ var touch_pointer_id: int = -1
 var stick_center_pos: Vector2 = Vector2.ZERO
 var current_output: Vector2 = Vector2.ZERO
 
-@onready var base_circle: Panel = $Base
-@onready var tip_handle: Panel = $Base/Tip
+@onready var base_circle: Panel = get_node_or_null("Base")
+@onready var tip_handle: Panel = get_node_or_null("Base/Tip")
 
 func _ready() -> void:
-	stick_center_pos = base_circle.position + (base_circle.size * 0.5)
+	if base_circle:
+		stick_center_pos = base_circle.position + (base_circle.size * 0.5)
 	_update_visibility()
-	EventBus.input_scheme_changed.connect(func(_scheme): _update_visibility())
+	if has_node("/root/EventBus"):
+		get_node("/root/EventBus").input_scheme_changed.connect(func(_scheme): _update_visibility())
 
 func _update_visibility() -> void:
-	# Show on mobile or if force-enabled in settings
-	var should_show = SettingsManager.show_touch_controls or PlatformManager.is_mobile()
-	visible = should_show
-	modulate.a = SettingsManager.touch_controls_opacity
+	var touch_enabled: bool = false
+	var opacity: float = 0.85
+	if has_node("/root/SettingsManager"):
+		var sm = get_node("/root/SettingsManager")
+		touch_enabled = sm.get("show_touch_controls")
+		opacity = sm.get("touch_controls_opacity")
+	if has_node("/root/PlatformManager"):
+		var pm = get_node("/root/PlatformManager")
+		if pm.has_method("is_mobile") and pm.is_mobile():
+			touch_enabled = true
+	elif OS.get_name() == "Android" or OS.get_name() == "iOS":
+		touch_enabled = true
+
+	visible = touch_enabled
+	modulate.a = opacity
 
 func _gui_input(event: InputEvent) -> void:
 	if event is InputEventScreenTouch:

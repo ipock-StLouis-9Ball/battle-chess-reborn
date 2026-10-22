@@ -3,12 +3,12 @@ extends Node
 
 ## Generic Finite State Machine manager
 
-signal transition_completed(new_state: State, previous_state: State)
+signal transition_completed(new_state: Node, previous_state: Node)
 
-@export var initial_state: State
+@export var initial_state: Node
 
-var current_state: State
-var previous_state: State
+var current_state: Node
+var previous_state: Node
 var states: Dictionary = {}
 
 func _ready() -> void:
@@ -37,7 +37,7 @@ func _physics_process(delta: float) -> void:
 func transition_to(target_state_name: String, msg: Dictionary = {}) -> void:
 	var target_key = target_state_name.to_lower()
 	if not states.has(target_key):
-		Logger.warn("StateMachine", "State %s does not exist" % target_state_name)
+		push_warning("[StateMachine] State %s does not exist" % target_state_name)
 		return
 
 	if current_state:

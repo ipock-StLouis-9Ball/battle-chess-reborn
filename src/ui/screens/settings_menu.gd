@@ -113,7 +113,7 @@ func _connect_signals() -> void:
 	)
 
 	option_difficulty.item_selected.connect(func(idx):
-		SettingsManager.ai_duel_difficulty = idx as GameEnums.AIDifficulty
+		SettingsManager.ai_duel_difficulty = idx
 		SettingsManager.save_settings()
 	)
 

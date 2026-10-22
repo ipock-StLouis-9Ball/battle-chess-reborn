@@ -25,7 +25,7 @@ signal movement_finished()
 @onready var pick_area: Area3D = $PickArea
 
 var current_tween: Tween
-var active_theme: PieceTheme
+var active_theme: Resource = null
 var is_selected: bool = false
 var base_scale: Vector3 = Vector3.ONE
 var ring_tween: Tween
@@ -55,7 +55,7 @@ func _setup_picking() -> void:
 		if not pick_area.input_event.is_connected(_on_input_event):
 			pick_area.input_event.connect(_on_input_event)
 
-func setup(type: String, color: String, theme_res: PieceTheme = null) -> void:
+func setup(type: String, color: String, theme_res: Resource = null) -> void:
 	piece_type = type.to_upper()
 	piece_color = color.to_lower()
 	_init_heroic_scale()
@@ -64,7 +64,7 @@ func setup(type: String, color: String, theme_res: PieceTheme = null) -> void:
 	else:
 		_update_materials()
 
-func apply_theme(theme_res: PieceTheme) -> void:
+func apply_theme(theme_res: Resource) -> void:
 	active_theme = theme_res
 	if theme_res == null or not is_instance_valid(mesh_instance):
 		return

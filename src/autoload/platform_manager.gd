@@ -18,11 +18,23 @@ enum TargetPlatform {
 	STANDALONE
 }
 
+# Input Schemes & Platform Types (matching GameEnums integer values)
+const PLATFORM_PC_STEAM: int = 0
+const PLATFORM_ANDROID_SAMSUNG: int = 1
+const PLATFORM_GENERIC_MOBILE: int = 2
+const PLATFORM_STEAM_DECK: int = 3
+const PLATFORM_WEB: int = 4
+const PLATFORM_UNKNOWN: int = 5
+
+const INPUT_KEYBOARD_MOUSE: int = 0
+const INPUT_GAMEPAD: int = 1
+const INPUT_TOUCH: int = 2
+
 const SAVE_PATH: String = "user://license_data.json"
 
 var current_platform: TargetPlatform = TargetPlatform.STANDALONE
-var current_platform_type: GameEnums.PlatformType = GameEnums.PlatformType.UNKNOWN
-var current_input_scheme: GameEnums.InputScheme = GameEnums.InputScheme.KEYBOARD_MOUSE
+var current_platform_type: int = PLATFORM_UNKNOWN
+var current_input_scheme: int = INPUT_KEYBOARD_MOUSE
 var is_touch_device: bool = false
 var is_samsung_galaxy: bool = false
 var device_model: String = ""
@@ -65,29 +77,29 @@ func _detect_platform() -> void:
 		if device_model.begins_with("SM-") or device_model.to_lower().contains("samsung") or device_model.to_lower().contains("galaxy"):
 			is_samsung_galaxy = true
 			current_platform = TargetPlatform.ANDROID_GALAXY
-			current_platform_type = GameEnums.PlatformType.ANDROID_SAMSUNG
+			current_platform_type = PLATFORM_ANDROID_SAMSUNG
 		else:
 			current_platform = TargetPlatform.ANDROID_GENERIC
-			current_platform_type = GameEnums.PlatformType.GENERIC_MOBILE
+			current_platform_type = PLATFORM_GENERIC_MOBILE
 		is_touch_device = true
-		current_input_scheme = GameEnums.InputScheme.TOUCH
+		current_input_scheme = INPUT_TOUCH
 		is_steam_edition = false
 		OS.set_restart_on_exit(false)
 	elif os_name in ["Windows", "Linux", "macOS"]:
 		if OS.has_feature("steamdeck") or OS.get_environment("SteamDeck") == "1":
 			current_platform = TargetPlatform.STEAM_DECK
-			current_platform_type = GameEnums.PlatformType.STEAM_DECK
-			current_input_scheme = GameEnums.InputScheme.GAMEPAD
+			current_platform_type = PLATFORM_STEAM_DECK
+			current_input_scheme = INPUT_GAMEPAD
 			is_touch_device = true
 		else:
 			current_platform = TargetPlatform.STEAM_PC
-			current_platform_type = GameEnums.PlatformType.PC_STEAM
-			current_input_scheme = GameEnums.InputScheme.KEYBOARD_MOUSE
+			current_platform_type = PLATFORM_PC_STEAM
+			current_input_scheme = INPUT_KEYBOARD_MOUSE
 			is_touch_device = DisplayServer.is_touchscreen_available()
 		is_steam_edition = true
 	else:
 		current_platform = TargetPlatform.STANDALONE
-		current_platform_type = GameEnums.PlatformType.UNKNOWN
+		current_platform_type = PLATFORM_UNKNOWN
 		is_touch_device = DisplayServer.is_touchscreen_available()
 		is_steam_edition = false
 
@@ -148,14 +160,14 @@ func get_safe_area_margins() -> Dictionary:
 
 func _unhandled_input(event: InputEvent) -> void:
 	if event is InputEventScreenTouch or event is InputEventScreenDrag:
-		_set_input_scheme(GameEnums.InputScheme.TOUCH)
+		_set_input_scheme(INPUT_TOUCH)
 	elif event is InputEventJoypadButton or event is InputEventJoypadMotion:
 		if (event is InputEventJoypadMotion and abs((event as InputEventJoypadMotion).axis_value) > 0.3) or event is InputEventJoypadButton:
-			_set_input_scheme(GameEnums.InputScheme.GAMEPAD)
+			_set_input_scheme(INPUT_GAMEPAD)
 	elif event is InputEventKey or (event is InputEventMouseButton and not is_touch_device):
-		_set_input_scheme(GameEnums.InputScheme.KEYBOARD_MOUSE)
+		_set_input_scheme(INPUT_KEYBOARD_MOUSE)
 
-func _set_input_scheme(new_scheme: GameEnums.InputScheme) -> void:
+func _set_input_scheme(new_scheme: int) -> void:
 	if current_input_scheme != new_scheme:
 		current_input_scheme = new_scheme
 		if has_node("/root/EventBus"):
@@ -249,11 +261,12 @@ func set_keep_screen_on(enabled: bool) -> void:
 func _handle_android_back_button() -> void:
 	if has_node("/root/GameManager"):
 		var gm = get_node("/root/GameManager")
-		if gm.current_state == GameEnums.GameState.DUEL_COMBAT or gm.current_state == GameEnums.GameState.BOARD_TURN:
-			gm.toggle_pause()
-		elif gm.current_state == GameEnums.GameState.PAUSED:
-			gm.toggle_pause()
-		elif gm.current_state == GameEnums.GameState.MAIN_MENU:
+		var st = gm.get("current_state")
+		# 4 = DUEL_COMBAT, 3 = BOARD_TURN, 5 = PAUSED, 1 = MAIN_MENU
+		if st == 4 or st == 3 or st == 5:
+			if gm.has_method("toggle_pause"):
+				gm.toggle_pause()
+		elif st == 1:
 			get_tree().quit()
 	elif get_tree().paused:
 		get_tree().paused = false

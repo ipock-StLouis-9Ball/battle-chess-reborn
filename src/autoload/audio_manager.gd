@@ -27,23 +27,25 @@ func _setup_audio_nodes() -> void:
 	add_child(_bgm_player)
 
 func _connect_event_bus() -> void:
-	EventBus.play_sfx_requested.connect(play_sfx)
-	EventBus.duel_clash_occurred.connect(func(dmg, crit, pos):
-		if crit:
-			play_sfx("crit", "Combat")
-		else:
-			play_sfx("clash", "Combat")
-	)
-	EventBus.move_executed.connect(func(from, to, attack):
-		if not attack:
-			play_sfx("move", "SFX")
-	)
-	EventBus.duel_triggered.connect(func(atk, df, pos):
-		play_sfx("duel_start", "Combat")
-	)
-	EventBus.match_ended.connect(func(winner, reason):
-		play_sfx("victory", "UI")
-	)
+	if has_node("/root/EventBus"):
+		var eb = get_node("/root/EventBus")
+		eb.play_sfx_requested.connect(play_sfx)
+		eb.duel_clash_occurred.connect(func(dmg, crit, pos):
+			if crit:
+				play_sfx("crit", "Combat")
+			else:
+				play_sfx("clash", "Combat")
+		)
+		eb.move_executed.connect(func(from, to, attack):
+			if not attack:
+				play_sfx("move", "SFX")
+		)
+		eb.duel_triggered.connect(func(atk, df, pos):
+			play_sfx("duel_start", "Combat")
+		)
+		eb.match_ended.connect(func(winner, reason):
+			play_sfx("victory", "UI")
+		)
 
 func play_sfx(sound_name: String, bus_name: String = "SFX") -> void:
 	var stream: AudioStream = null

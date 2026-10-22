@@ -320,7 +320,7 @@ func _sync_3d_pieces() -> void:
 					active_pieces[pos] = piece_node
 
 ## Apply active theme materials to the pedestal, notation, braziers, and pieces
-func apply_theme(theme_res: PieceTheme) -> void:
+func apply_theme(theme_res: Resource) -> void:
 	if theme_res == null:
 		return
 

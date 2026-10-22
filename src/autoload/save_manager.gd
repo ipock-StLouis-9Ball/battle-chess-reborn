@@ -34,7 +34,7 @@ func load_profile() -> void:
 		if parsed is Dictionary:
 			for key in parsed:
 				profile_data[key] = parsed[key]
-			Logger.info("SaveManager", "Player profile loaded")
+			print("[SaveManager] Player profile loaded")
 		file.close()
 
 func save_profile() -> void:
@@ -43,16 +43,17 @@ func save_profile() -> void:
 		var json_str = JSON.stringify(profile_data, "\t")
 		file.store_string(json_str)
 		file.close()
-		Logger.info("SaveManager", "Player profile persisted")
-		EventBus.profile_updated.emit(profile_data)
+		print("[SaveManager] Player profile persisted")
+		if has_node("/root/EventBus"):
+			get_node("/root/EventBus").profile_updated.emit(profile_data)
 
-func record_duel_result(winner_is_attacker: bool, winner_piece_type: GameEnums.PieceType, loser_piece_type: GameEnums.PieceType, player_won: bool) -> void:
+func record_duel_result(winner_is_attacker: bool, winner_piece_type: int = 1, loser_piece_type: int = 1, player_won: bool = false) -> void:
 	profile_data["duels_fought"] = profile_data.get("duels_fought", 0) + 1
 	if player_won:
 		profile_data["duels_won"] = profile_data.get("duels_won", 0) + 1
 	
-	# Underdog detection (e.g. Pawn defeating higher tier piece)
-	if winner_piece_type == GameEnums.PieceType.PAWN and loser_piece_type != GameEnums.PieceType.PAWN:
+	# Underdog detection (1 = Pawn; Pawn defeating higher tier piece)
+	if winner_piece_type == 1 and loser_piece_type != 1:
 		profile_data["underdog_victories"] = profile_data.get("underdog_victories", 0) + 1
 	
 	save_profile()
@@ -73,7 +74,7 @@ func save_active_match(match_dict: Dictionary) -> void:
 	if file:
 		file.store_string(JSON.stringify(match_dict))
 		file.close()
-		Logger.info("SaveManager", "Active match saved")
+		print("[SaveManager] Active match saved")
 
 func load_saved_match() -> Dictionary:
 	if not has_saved_match():

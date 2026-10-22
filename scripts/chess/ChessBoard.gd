@@ -12,7 +12,7 @@ signal selection_cleared()
 signal duel_triggered(attacker: Dictionary, victim: Dictionary, board_pos: Vector2i, from_pos: Vector2i)
 signal check_declared(king_color: String)
 signal game_over(winner_color: String, reason: String)
-signal theme_swapped(theme_id: String, piece_theme: PieceTheme)
+signal theme_swapped(theme_id: String, piece_theme: Resource)
 
 enum TurnState {
 	WHITE_TURN,
@@ -44,7 +44,7 @@ var halfmove_clock: int = 0
 
 # Theme wiring
 var current_theme_id: String = "high_fantasy"
-var current_piece_theme: PieceTheme = null
+var current_piece_theme: Resource = null
 
 func _init() -> void:
 	_init_matrix()
@@ -65,7 +65,7 @@ func _connect_theme_manager() -> void:
 func _on_theme_changed(theme_id: String, _data: Dictionary) -> void:
 	apply_theme(theme_id)
 
-func _on_piece_theme_changed(theme_res: PieceTheme) -> void:
+func _on_piece_theme_changed(theme_res: Resource) -> void:
 	if theme_res != null:
 		current_piece_theme = theme_res
 		theme_swapped.emit(current_theme_id, current_piece_theme)
@@ -79,7 +79,7 @@ func apply_theme(theme_id: String) -> void:
 	theme_swapped.emit(current_theme_id, current_piece_theme)
 	board_updated.emit()
 
-func get_current_piece_theme() -> PieceTheme:
+func get_current_piece_theme() -> Resource:
 	return current_piece_theme
 
 func _init_matrix() -> void:

@@ -143,10 +143,60 @@ class CodebaseAuditor:
             print_warn("common/enable_object_picking=true not found in project.godot; will rely on default engine picking.")
 
     # -------------------------------------------------------------------------
-    # 2. Global class_name Uniqueness Audit
+    # 2. Autoload Cyclic Reference & Decoupling Audit
+    # -------------------------------------------------------------------------
+    def audit_autoload_decoupling(self) -> None:
+        print_header("2. Autoload Cyclic Reference & Decoupling Audit")
+        pg_path = os.path.join(self.root_dir, "project.godot")
+        with open(pg_path, "r", encoding="utf-8") as fp:
+            content = fp.read()
+        autoload_matches = re.findall(r'^\s*([A-Za-z0-9_]+)="(\*?res://([^"]+))"', content, re.MULTILINE)
+        autoload_names = [m[0] for m in autoload_matches]
+
+        all_clean = True
+        for name, full_res, rel_path in autoload_matches:
+            target_path = os.path.join(self.root_dir, rel_path)
+            if not os.path.exists(target_path):
+                continue
+            with open(target_path, "r", encoding="utf-8") as fp:
+                lines = fp.readlines()
+
+            in_func = False
+            for lnum, raw_line in enumerate(lines, 1):
+                line = raw_line.strip()
+                if line.startswith("func ") or line.startswith("static func "):
+                    in_func = True
+
+                # Check top-level variable declarations (outside functions)
+                if not in_func:
+                    # Check for non-builtin type annotations like ': GameEnums.' or ': PieceTheme'
+                    if re.match(r'^(?:@\w+\s+)?var\s+\w+\s*:\s*(?:GameEnums\.|PieceTheme\b|State\b|ChessBoard\b)', line):
+                        print_fail(f"Autoload '{name}' ({rel_path}:{lnum}) has compile-time class type annotation: {line}")
+                        self.total_errors += 1
+                        all_clean = False
+
+                    # Check for top-level singleton invocation in var initializers
+                    for other_auto in autoload_names:
+                        if re.search(r'^(?:@\w+\s+)?var\s+\w+.*=\s*.*\b' + other_auto + r'\.', line):
+                            print_fail(f"Autoload '{name}' ({rel_path}:{lnum}) calls singleton '{other_auto}' at file-load time: {line}")
+                            self.total_errors += 1
+                            all_clean = False
+
+                    # Check for signal arguments typed as custom class_name or GameEnums
+                    if line.startswith("signal "):
+                        if re.search(r':\s*(?:GameEnums\.|PieceTheme\b|State\b)', line):
+                            print_fail(f"Autoload '{name}' ({rel_path}:{lnum}) signal has custom class type hint: {line}")
+                            self.total_errors += 1
+                            all_clean = False
+
+        if all_clean:
+            print_pass("All Autoload singletons are completely decoupled from top-level class_name and singleton references.")
+
+    # -------------------------------------------------------------------------
+    # 3. Global class_name Uniqueness Audit
     # -------------------------------------------------------------------------
     def audit_class_name_uniqueness(self) -> None:
-        print_header("2. Global Class Name Uniqueness Audit")
+        print_header("3. Global Class Name Uniqueness Audit")
         declared_classes = defaultdict(list)
 
         for rel_path in self.gd_files:
@@ -169,10 +219,10 @@ class CodebaseAuditor:
             print_pass(f"All {len(declared_classes)} declared class_names are globally unique across the project.")
 
     # -------------------------------------------------------------------------
-    # 3. GDScript Indentation & Lexical Syntax Audit
+    # 4. GDScript Indentation & Lexical Syntax Audit
     # -------------------------------------------------------------------------
     def audit_gdscript_syntax(self) -> None:
-        print_header("3. GDScript Syntax, Indentation & Lexical Audit")
+        print_header("4. GDScript Syntax, Indentation & Lexical Audit")
         syntax_clean = True
 
         for rel_path in self.gd_files:
@@ -259,10 +309,10 @@ class CodebaseAuditor:
             print_pass(f"All {len(self.gd_files)} GDScript files passed lexical, indentation, and operator validation.")
 
     # -------------------------------------------------------------------------
-    # 4. Resource & Scene Link Integrity Audit
+    # 5. Resource & Scene Link Integrity Audit
     # -------------------------------------------------------------------------
     def audit_resource_links(self) -> None:
-        print_header("4. Resource & Scene Link Integrity Audit")
+        print_header("5. Resource & Scene Link Integrity Audit")
         missing_resources = []
 
         # Check preloads and loads in GDScript
@@ -296,10 +346,10 @@ class CodebaseAuditor:
             print_pass(f"All resource dependencies across {total_checked} files verified to exist on disk.")
 
     # -------------------------------------------------------------------------
-    # 5. Clean-Room Rebranding & Monetization Integrity Audit
+    # 6. Clean-Room Rebranding & Monetization Integrity Audit
     # -------------------------------------------------------------------------
     def audit_branding_and_monetization(self) -> None:
-        print_header("5. Branding & Unified Monetization Audit")
+        print_header("6. Branding & Unified Monetization Audit")
         
         # 1. Check trademark risks
         trademark_violations = []
@@ -350,13 +400,22 @@ class CodebaseAuditor:
                 print_warn("export_presets.cfg does not mention $9.99 pricing in metadata.")
 
     # -------------------------------------------------------------------------
-    # 6. Phone Storage Synchronization & Verification
+    # 7. Phone Storage Synchronization & Verification
     # -------------------------------------------------------------------------
     def audit_and_sync_phone(self) -> None:
-        print_header("6. Phone Storage Synchronization & Checksum Verification")
+        print_header("7. Phone Storage Synchronization & Checksum Verification")
         if not os.path.exists(self.phone_dir):
             print_warn(f"Phone storage directory not accessible at: {self.phone_dir}")
             return
+
+        # Purge stale .godot/ cache on phone directory for fresh indexing
+        phone_godot_cache = os.path.join(self.phone_dir, ".godot")
+        if os.path.exists(phone_godot_cache):
+            try:
+                shutil.rmtree(phone_godot_cache)
+                print_pass("Purged stale .godot/ cache on phone storage for fresh Godot 4 re-indexing.")
+            except Exception as e:
+                print_warn(f"Failed to purge .godot/ cache on phone: {e}")
 
         if self.auto_sync:
             print_info(f"Mirroring workspace files to {self.phone_dir}...")
@@ -429,6 +488,7 @@ class CodebaseAuditor:
         print(f"Phone Target: {self.phone_dir}")
 
         self.audit_project_configuration()
+        self.audit_autoload_decoupling()
         self.audit_class_name_uniqueness()
         self.audit_gdscript_syntax()
         self.audit_resource_links()

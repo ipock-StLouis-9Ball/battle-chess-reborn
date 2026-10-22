@@ -10,7 +10,7 @@ enum Level {
 	ERROR,
 }
 
-static var min_level: Level = Level.DEBUG
+static var min_level: int = Level.DEBUG
 
 static func _format(level_str: String, tag: String, message: String) -> String:
 	var time_dict = Time.get_time_dict_from_system()
