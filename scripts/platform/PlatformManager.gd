@@ -22,6 +22,7 @@ var current_platform: TargetPlatform = TargetPlatform.STANDALONE
 var is_samsung_galaxy: bool = false
 var device_model: String = ""
 var display_refresh_rate: float = 60.0
+var device_refresh_rate: float = 60.0
 
 # Feature Flags
 var is_steam_edition: bool = false
@@ -76,6 +77,7 @@ func _detect_display() -> void:
 				display_refresh_rate = DisplayServer.screen_get_refresh_rate(0)
 	if display_refresh_rate <= 0.0:
 		display_refresh_rate = 60.0
+	device_refresh_rate = display_refresh_rate
 
 func _load_license_data() -> void:
 	if is_steam_edition:
@@ -162,11 +164,20 @@ func trigger_haptic(duration_ms: int = 40) -> void:
 	if is_android():
 		Input.vibrate_handheld(duration_ms)
 
+func is_mobile() -> bool:
+	return is_android()
+
 func is_android() -> bool:
 	return current_platform == TargetPlatform.ANDROID_GALAXY or current_platform == TargetPlatform.ANDROID_GENERIC
 
 func is_desktop() -> bool:
 	return current_platform == TargetPlatform.STEAM_PC or current_platform == TargetPlatform.STEAM_DECK
+
+func set_keep_screen_on(enabled: bool) -> void:
+	DisplayServer.screen_set_keep_on(enabled)
+
+func get_safe_area() -> Rect2i:
+	return DisplayServer.get_display_safe_area()
 
 func _handle_android_back_button() -> void:
 	if get_tree().paused:

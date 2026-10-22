@@ -30,11 +30,73 @@ func get_duel_animation(theme: String, attacker: String, victim: String) -> Dict
 	var atk = attacker.to_upper()
 	var vic = victim.to_upper()
 
+	var raw_data: Dictionary
 	if theme_table.has(atk) and theme_table[atk].has(vic):
-		return theme_table[atk][vic]
+		raw_data = theme_table[atk][vic]
+	else:
+		raw_data = _get_thematic_fallback(current_theme, atk, vic)
 
-	# Fallback generic thematic animation
-	return _get_thematic_fallback(current_theme, atk, vic)
+	return _enrich_with_3act_data(current_theme, atk, vic, raw_data)
+
+func _enrich_with_3act_data(theme: String, atk: String, vic: String, data: Dictionary) -> Dictionary:
+	var result = data.duplicate()
+	var atk_name = _piece_name(atk)
+	var vic_name = _piece_name(vic)
+
+	result["duration"] = 8.0
+	result["act1_duration"] = 2.5
+	result["act2_duration"] = 2.5
+	result["act3_duration"] = 2.5
+	result["camera_angle"] = "capture_zoom"
+
+	if not result.has("victim_collapse"):
+		match atk:
+			"N", "K": result["victim_collapse"] = "decapitate"
+			"B", "Q": result["victim_collapse"] = "disintegrate"
+			_: result["victim_collapse"] = "collapse"
+
+	match theme:
+		THEME_CYBERPUNK:
+			if not result.has("act1_name"):
+				result["act1_name"] = "Plasma Salvo"
+			if not result.has("act1_desc"):
+				result["act1_desc"] = "The %s unloads a heavy plasma burst, deflected by the %s's kinetic barrier!" % [atk_name, vic_name]
+			if not result.has("act2_name"):
+				result["act2_name"] = "EMP Counter-Surge"
+			if not result.has("act2_desc"):
+				result["act2_desc"] = "The %s retaliates with an overcharged shockwave, but the %s sidesteps the arc!" % [vic_name, atk_name]
+			if not result.has("act3_name"):
+				result["act3_name"] = "Thermal Core Execution"
+			if not result.has("act3_desc"):
+				result["act3_desc"] = "The %s overcharges its core, obliterating the %s in a blinding flash of energy!" % [atk_name, vic_name]
+		THEME_ELDRITCH:
+			if not result.has("act1_name"):
+				result["act1_name"] = "Void Tendril Lash"
+			if not result.has("act1_desc"):
+				result["act1_desc"] = "The %s lashes shadowy abyssal tendrils, repelled by the %s's defensive barrier!" % [atk_name, vic_name]
+			if not result.has("act2_name"):
+				result["act2_name"] = "Psychic Backlash"
+			if not result.has("act2_desc"):
+				result["act2_desc"] = "The %s unleashes a psychic curse scream, deflected by the %s's dark aura!" % [vic_name, atk_name]
+			if not result.has("act3_name"):
+				result["act3_name"] = "Abyssal Maw Rapture"
+			if not result.has("act3_desc"):
+				result["act3_desc"] = "The %s tears open a cosmic void rift, consuming the %s into the eternal abyss!" % [atk_name, vic_name]
+		_: # High Fantasy default
+			if not result.has("act1_name"):
+				result["act1_name"] = "Opening Strike"
+			if not result.has("act1_desc"):
+				result["act1_desc"] = "The %s lunges forward with a heavy opening blow, deflected by the %s's guard!" % [atk_name, vic_name]
+			if not result.has("act2_name"):
+				result["act2_name"] = "Counter-Blow"
+			if not result.has("act2_desc"):
+				result["act2_desc"] = "The %s retaliates with a fierce counter-attack, but the %s deftly evades the strike!" % [vic_name, atk_name]
+			if not result.has("act3_name"):
+				result["act3_name"] = "The Finisher"
+			if not result.has("act3_desc"):
+				result["act3_desc"] = "The %s executes their signature theme finisher, striking down the %s!" % [atk_name, vic_name]
+
+	return result
 
 func _build_high_fantasy_matrix() -> Dictionary:
 	return {

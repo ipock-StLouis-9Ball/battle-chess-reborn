@@ -17,7 +17,12 @@ config/icon="res://assets/icons/app_icon.png"
 
 [autoload]
 
+EventBus="*res://src/autoload/event_bus.gd"
 PlatformManager="*res://scripts/platform/PlatformManager.gd"
+SettingsManager="*res://src/autoload/settings_manager.gd"
+SaveManager="*res://src/autoload/save_manager.gd"
+AudioManager="*res://src/autoload/audio_manager.gd"
+GameManager="*res://src/autoload/game_manager.gd"
 KillMatrix="*res://scripts/combat/KillMatrix.gd"
 DuelDirector="*res://scripts/combat/DuelDirector.gd"
 EloCalculator="*res://scripts/multiplayer/EloCalculator.gd"
@@ -48,6 +53,10 @@ renderer/rendering_method="mobile"
 renderer/rendering_method.mobile="mobile"
 textures/vram_compression/import_etc2_astc=true
 environment/defaults/default_clear_color=Color(0.05, 0.06, 0.08, 1)
+
+[physics]
+
+common/enable_object_picking=true
 
 [input]
 

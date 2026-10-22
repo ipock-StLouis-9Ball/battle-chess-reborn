@@ -1,13 +1,13 @@
 class_name MainView
-extends Control
+extends Node3D
 
 ## Heroic 3D Isometric Combat Chess - Master Scene Controller
 ## Pure 3D tactical battlefield orchestrating 3D pieces, dynamic theme materials,
 ## cinematic duel executions, ranked Elo progression, and cross-platform HUD.
 
 @onready var chess_logic: ChessBoard = $ChessLogic
-@onready var board_3d: Board3D = $SubViewportContainer/SubViewport/Board3D
-@onready var duel_arena_view: DuelArenaView = $DuelArena
+@onready var board_3d: Board3D = $Board3D
+@onready var duel_arena_view: DuelArenaView = $HUD/DuelArena
 
 # HUD elements
 @onready var turn_label: Label = $HUD/TopBar/TurnLabel

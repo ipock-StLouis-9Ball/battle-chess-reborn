@@ -5,7 +5,11 @@ extends Node3D
 ## - Scaled gladiator character standing ~1.8x to 2.2x tile width (4.5m - 5.5m tall)
 ## - 3D raycast touch picking colliders and emissive glowing selection ring
 ## - Bone attachment sockets (Hand_R_Socket, Head_Socket)
-## - Parabolic leap movement, attack lunges, hit stagger, and dramatic execution reactions
+## - 3-Act choreographed battle animations:
+##   * Act 1: Heavy Opening Strike & Defensive Block/Parry
+##   * Act 2: Retaliation Counter-Blow & Sidestep Evade/Deflect
+##   * Act 3: Signature Finisher Execution & Dramatic Collapse
+## - Parabolic leap movement, attack lunges, hit stagger, and execution reactions
 
 signal clicked(pos: Vector2i)
 signal movement_finished()
@@ -142,6 +146,14 @@ func set_selected(selected: bool) -> void:
 		else:
 			selection_ring.scale = Vector3.ONE
 
+## Smoothly face a target world position
+func face_target(target_pos: Vector3) -> void:
+	var dir = (target_pos - position).normalized()
+	if dir.length_squared() > 0.01:
+		var target_yaw = atan2(dir.x, dir.z)
+		var rot_tw = create_tween().set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+		rot_tw.tween_property(self, "rotation:y", target_yaw, 0.18)
+
 ## Smooth heroic leap across the 3D battlefield
 func animate_move_to(target_pos: Vector3, duration: float = 0.45) -> Signal:
 	if current_tween and current_tween.is_valid():
@@ -189,6 +201,97 @@ func execute_attack_strike(target_pos: Vector3) -> Signal:
 	tw.parallel().tween_property(self, "scale", base_scale, 0.2)
 	return tw.finished
 
+## Act 1: Attacker delivers heavy opening blow
+func play_act1_strike(target_pos: Vector3) -> void:
+	face_target(target_pos)
+	var dir = (target_pos - position).normalized()
+	var start_pos = position
+	var strike_pos = position + dir * 1.15
+
+	var tw = create_tween().set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	# Windup (0.0 - 0.35s)
+	tw.tween_property(self, "position", start_pos - dir * 0.35, 0.35)
+	tw.parallel().tween_property(self, "scale", base_scale * Vector3(0.92, 1.12, 0.92), 0.35)
+	# Heavy Strike Lunge (0.35 - 0.75s)
+	tw.chain().tween_property(self, "position", strike_pos, 0.4)
+	tw.parallel().tween_property(self, "scale", base_scale * Vector3(1.22, 0.88, 1.22), 0.4)
+	# Recoil/Stance Recovery (0.75 - 1.6s)
+	tw.chain().tween_property(self, "position", start_pos, 0.85)
+	tw.parallel().tween_property(self, "scale", base_scale, 0.85)
+
+## Act 1: Defender parries/blocks with shield or weapon
+func play_act1_block(attacker_pos: Vector3) -> void:
+	face_target(attacker_pos)
+	var dir = (position - attacker_pos).normalized()
+	var start_pos = position
+
+	var tw = create_tween().set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	# Brace anticipation (0.0 - 0.4s)
+	tw.tween_interval(0.4)
+	# Impact recoil (0.4 - 0.65s)
+	tw.chain().tween_property(self, "position", start_pos + dir * 0.45, 0.18)
+	tw.parallel().tween_property(self, "rotation_degrees:x", -14.0, 0.18)
+	tw.parallel().tween_property(self, "scale", base_scale * Vector3(1.15, 0.9, 1.15), 0.18)
+	# Recover to combat stance
+	tw.chain().tween_property(self, "position", start_pos, 0.7)
+	tw.parallel().tween_property(self, "rotation_degrees:x", 0.0, 0.7)
+	tw.parallel().tween_property(self, "scale", base_scale, 0.7)
+
+## Act 2: Defender retaliates with a counter-attack
+func play_act2_counter(target_pos: Vector3) -> void:
+	face_target(target_pos)
+	var dir = (target_pos - position).normalized()
+	var start_pos = position
+	var counter_pos = position + dir * 1.25
+
+	var tw = create_tween().set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	# Fast counter-strike lunge
+	tw.tween_property(self, "position", counter_pos, 0.4)
+	tw.parallel().tween_property(self, "rotation_degrees:z", 22.0, 0.4)
+	tw.parallel().tween_property(self, "scale", base_scale * Vector3(1.15, 1.15, 1.15), 0.4)
+	# Reset
+	tw.chain().tween_property(self, "position", start_pos, 0.65)
+	tw.parallel().tween_property(self, "rotation_degrees:z", 0.0, 0.65)
+	tw.parallel().tween_property(self, "scale", base_scale, 0.65)
+
+## Act 2: Attacker sidesteps, ducks, or deflects the strike
+func play_act2_dodge() -> void:
+	var start_pos = position
+	var side_dir = transform.basis.x.normalized()
+
+	var tw = create_tween().set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+	tw.tween_interval(0.2)
+	# Evade: sidestep and duck
+	tw.chain().tween_property(self, "position", start_pos + side_dir * 0.9 - Vector3(0, 0.35, 0), 0.3)
+	tw.parallel().tween_property(self, "rotation_degrees:z", -15.0, 0.3)
+	# Recover into stance
+	tw.chain().tween_property(self, "position", start_pos, 0.55)
+	tw.parallel().tween_property(self, "rotation_degrees:z", 0.0, 0.55)
+
+## Act 3: Attacker executes signature theme kill shot
+func play_act3_finisher(target_pos: Vector3, _atk_type: String, _theme_id: String) -> void:
+	face_target(target_pos)
+	var dir = (target_pos - position).normalized()
+	var start_pos = position
+	var impact_pos = target_pos - dir * 0.3
+
+	# Power-up energy surge
+	if mesh_instance and mesh_instance.material_override is StandardMaterial3D:
+		var mat = mesh_instance.material_override as StandardMaterial3D
+		var glow_tw = create_tween()
+		glow_tw.tween_property(mat, "emission_energy_multiplier", 4.5, 0.6)
+
+	var tw = create_tween().set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_IN)
+	# Windup leap into air (0.0 - 0.75s)
+	tw.tween_property(self, "position", start_pos + Vector3(0, 2.4, 0) - dir * 0.6, 0.75)
+	tw.parallel().tween_property(self, "scale", base_scale * Vector3(1.3, 1.3, 1.3), 0.75)
+	# Devastating Execution Plunge (0.75 - 0.95s)
+	tw.set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_BOUNCE)
+	tw.chain().tween_property(self, "position", impact_pos, 0.2)
+	tw.parallel().tween_property(self, "scale", base_scale * Vector3(1.4, 0.7, 1.4), 0.15)
+	# Settle scale
+	tw.chain().tween_property(self, "scale", base_scale, 0.35)
+
 ## Impact reaction when hit
 func play_hit_stagger() -> void:
 	var tw = create_tween()
@@ -198,6 +301,11 @@ func play_hit_stagger() -> void:
 
 ## Dramatic death collapse / execution reaction
 func play_death_reaction(reaction_type: String = "collapse") -> void:
+	if ring_tween and ring_tween.is_valid():
+		ring_tween.kill()
+	if selection_ring:
+		selection_ring.visible = false
+
 	var tw = create_tween().set_trans(Tween.TRANS_BOUNCE).set_ease(Tween.EASE_OUT)
 	match reaction_type:
 		"decapitate":
@@ -208,11 +316,13 @@ func play_death_reaction(reaction_type: String = "collapse") -> void:
 			tw.tween_property(self, "rotation_degrees:x", 85.0, 0.4)
 			tw.parallel().tween_property(self, "scale", Vector3(0.01, 0.01, 0.01), 0.75)
 		"disintegrate":
-			tw.tween_property(self, "scale", Vector3(0.01, 0.01, 0.01), 0.45)
+			tw.set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
+			tw.tween_property(self, "scale", Vector3(1.6, 0.01, 1.6), 0.35)
+			tw.chain().tween_property(self, "scale", Vector3(0.001, 0.001, 0.001), 0.35)
 		_: # collapse
 			tw.tween_property(self, "rotation_degrees:z", -85.0, 0.45)
 			tw.parallel().tween_property(self, "position:y", position.y - 0.4, 0.45)
-			tw.chain().tween_property(self, "scale", Vector3(0.01, 0.01, 0.01), 0.35)
+			tw.chain().tween_property(self, "scale", Vector3(0.01, 0.01, 0.01), 0.45)
 
 func _on_input_event(_camera: Camera3D, event: InputEvent, _pos: Vector3, _normal: Vector3, _shape_idx: int) -> void:
 	if (event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed) or \

@@ -9,7 +9,7 @@ signal board_updated()
 signal turn_changed(turn_color: String, turn_number: int)
 signal piece_selected(pos: Vector2i, piece_info: Dictionary)
 signal selection_cleared()
-signal duel_triggered(attacker: Dictionary, victim: Dictionary, board_pos: Vector2i)
+signal duel_triggered(attacker: Dictionary, victim: Dictionary, board_pos: Vector2i, from_pos: Vector2i)
 signal check_declared(king_color: String)
 signal game_over(winner_color: String, reason: String)
 signal theme_swapped(theme_id: String, piece_theme: PieceTheme)
@@ -232,7 +232,7 @@ func execute_move(move: Dictionary) -> void:
 
 		# Trigger Duel Director for battle resolution!
 		current_state = TurnState.DUEL_IN_PROGRESS
-		duel_triggered.emit(piece, victim, to_pos)
+		duel_triggered.emit(piece, victim, to_pos, from_pos)
 
 		if has_node("/root/DuelDirector"):
 			var dd = get_node("/root/DuelDirector")

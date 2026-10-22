@@ -498,37 +498,100 @@ func _clear_highlights() -> void:
 			h.queue_free()
 	active_highlights.clear()
 
-## Cinematic duel clash animation sequence
-func _on_duel_triggered(attacker: Dictionary, victim: Dictionary, board_pos: Vector2i) -> void:
-	var from_pos = Vector2i(-1, -1)
-	for pos in active_pieces.keys():
-		var p: Piece3D = active_pieces[pos]
-		if is_instance_valid(p) and p.piece_type == attacker.get("type") and p.piece_color == attacker.get("color"):
-			from_pos = pos
-			break
+## Scripted 5-8 second 3-act cinematic duel clash execution
+func _on_duel_triggered(attacker: Dictionary, victim: Dictionary, board_pos: Vector2i, from_pos: Vector2i = Vector2i(-1, -1)) -> void:
+	if from_pos == Vector2i(-1, -1) and chess_board and chess_board.selected_tile != Vector2i(-1, -1):
+		from_pos = chess_board.selected_tile
+
+	if from_pos == Vector2i(-1, -1):
+		for pos in active_pieces.keys():
+			var p: Piece3D = active_pieces[pos]
+			if is_instance_valid(p) and p.piece_type == attacker.get("type") and p.piece_color == attacker.get("color"):
+				from_pos = pos
+				break
+
+	is_animating_move = true
+	_clear_highlights()
 
 	var target_wpos = board_to_world(board_pos)
+	var atk_piece: Piece3D = active_pieces.get(from_pos, null)
+	var vic_piece: Piece3D = active_pieces.get(board_pos, null)
 
-	# Camera plunges into dynamic duel action
+	# Trigger DuelDirector for targeted square zoom, slow-mo, and narrative
 	if has_node("/root/DuelDirector"):
 		get_node("/root/DuelDirector").start_cinematic_duel(attacker, victim, Vector2(target_wpos.x, target_wpos.z))
 
-	if active_pieces.has(from_pos):
-		var atk_piece: Piece3D = active_pieces[from_pos]
-		atk_piece.execute_attack_strike(target_wpos)
+	# Combat staging: attacker moves to boundary of contested square, pieces face each other
+	if is_instance_valid(atk_piece) and is_instance_valid(vic_piece):
+		var dir = (target_wpos - atk_piece.position).normalized()
+		if dir.length_squared() < 0.01:
+			dir = Vector3(0, 0, 1)
 
-	if active_pieces.has(board_pos):
-		var vic_piece: Piece3D = active_pieces[board_pos]
+		var atk_clash_pos = target_wpos - dir * 1.2
+		atk_piece.animate_move_to(atk_clash_pos, 0.35)
+		atk_piece.face_target(target_wpos)
+		vic_piece.face_target(atk_clash_pos)
+		await get_tree().create_timer(0.35).timeout
+
+		# --- ACT 1 (0.0s - 2.5s): Opening Strike & Defensive Block/Parry ---
+		if is_instance_valid(atk_piece):
+			atk_piece.play_act1_strike(target_wpos)
 		await get_tree().create_timer(0.4).timeout
 		if is_instance_valid(vic_piece):
-			vic_piece.play_hit_stagger()
+			vic_piece.play_act1_block(atk_piece.position)
+		await get_tree().create_timer(1.75).timeout
+
+		# --- ACT 2 (2.5s - 5.0s): Counter-Blow & Sidestep Evade ---
+		if is_instance_valid(vic_piece):
+			vic_piece.play_act2_counter(atk_piece.position)
+		await get_tree().create_timer(0.3).timeout
+		if is_instance_valid(atk_piece):
+			atk_piece.play_act2_dodge()
+		await get_tree().create_timer(2.2).timeout
+
+		# --- ACT 3 (5.0s - 7.5s): Signature Finisher & Dramatic Death Collapse ---
+		var atk_type = attacker.get("type", "P")
+		var theme_id = "high_fantasy"
+		if has_node("/root/ThemeManager"):
+			theme_id = get_node("/root/ThemeManager").current_theme
+		if is_instance_valid(atk_piece):
+			atk_piece.play_act3_finisher(vic_piece.position, atk_type, theme_id)
+
+		# Wait for kill impact moment
 		await get_tree().create_timer(0.8).timeout
 		if is_instance_valid(vic_piece):
-			vic_piece.play_death_reaction("collapse")
+			var collapse_type = "collapse"
+			if has_node("/root/DuelDirector"):
+				var dd = get_node("/root/DuelDirector")
+				if dd.active_duel_data:
+					collapse_type = dd.active_duel_data.get("victim_collapse", "collapse")
+			vic_piece.play_death_reaction(collapse_type)
+
+		# Wait for death animation to settle, then attacker claims the square center
+		await get_tree().create_timer(1.35).timeout
+		if is_instance_valid(atk_piece):
+			atk_piece.animate_move_to(target_wpos, 0.35)
+		await get_tree().create_timer(0.35).timeout
+
+	# Wait for duel director to conclude
+	if has_node("/root/DuelDirector"):
+		var dd = get_node("/root/DuelDirector")
+		if dd.is_duel_in_progress:
+			await dd.duel_completed
+
+	# Finalize board piece tracking
+	active_pieces.erase(from_pos)
+	if is_instance_valid(vic_piece):
+		vic_piece.queue_free()
+	if is_instance_valid(atk_piece):
+		atk_piece.board_pos = board_pos
+		active_pieces[board_pos] = atk_piece
+
+	is_animating_move = false
 
 ## Screen touch raycast fallback to guarantee touch picking across all mobile devices
 func _unhandled_input(event: InputEvent) -> void:
-	if not is_instance_valid(camera_3d):
+	if not is_instance_valid(camera_3d) or is_animating_move:
 		return
 	var click_pos = Vector2.ZERO
 	var is_click = false
@@ -552,15 +615,20 @@ func _unhandled_input(event: InputEvent) -> void:
 	var hit = space.intersect_ray(query)
 
 	if hit and hit.has("collider"):
-		var collider = hit["collider"]
-		if collider.has_meta("piece_pos"):
-			_handle_interaction(collider.get_meta("piece_pos"))
+		var col = hit["collider"]
+		var target_piece: Piece3D = null
+		if col is Piece3D:
+			target_piece = col
+		elif col.get_parent() is Piece3D:
+			target_piece = col.get_parent() as Piece3D
+		elif col.owner is Piece3D:
+			target_piece = col.owner as Piece3D
+
+		if target_piece:
+			_handle_interaction(target_piece.board_pos)
 			return
-		var parent = collider.get_parent()
-		if parent is Piece3D:
-			_handle_interaction(parent.board_pos)
-			return
+
 		for grid_pos in tile_areas.keys():
-			if tile_areas[grid_pos] == collider:
+			if tile_areas[grid_pos] == col or tile_areas[grid_pos].is_ancestor_of(col):
 				_handle_interaction(grid_pos)
 				return
