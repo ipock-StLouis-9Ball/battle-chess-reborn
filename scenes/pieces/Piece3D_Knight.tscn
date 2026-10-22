@@ -3,8 +3,8 @@
 [ext_resource type="Script" path="res://scenes/pieces/Piece3D.gd" id="1_piece3d"]
 
 [sub_resource type="TorusMesh" id="TorusMesh_ring"]
-inner_radius = 0.98
-outer_radius = 1.18
+inner_radius = 0.78
+outer_radius = 0.98
 rings = 24
 ring_segments = 24
 
@@ -16,8 +16,8 @@ emission = Color(1, 0.85, 0.25, 1)
 emission_energy_multiplier = 0.5
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_pick"]
-radius = 1.0
-height = 4.75
+radius = 0.72
+height = 2.05
 
 [node name="Piece3D_Knight" type="Node3D"]
 script = ExtResource("1_piece3d")
@@ -29,10 +29,10 @@ piece_type = "N"
 visible = false
 
 [node name="Hand_R_Socket" type="Marker3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.95, 2.65, 0.45)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.5, 1.1, 0.25)
 
 [node name="Head_Socket" type="Marker3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4.65, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.0, 0)
 
 [node name="SelectionRing" type="MeshInstance3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.05, 0)
@@ -43,5 +43,5 @@ mesh = SubResource("TorusMesh_ring")
 [node name="PickArea" type="Area3D" parent="."]
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="PickArea"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.375, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.025, 0)
 shape = SubResource("CapsuleShape3D_pick")

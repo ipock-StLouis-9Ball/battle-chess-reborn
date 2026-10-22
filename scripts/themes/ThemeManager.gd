@@ -17,8 +17,8 @@ const THEMES = {
 		"id": "high_fantasy",
 		"name": "High Fantasy: Realm of Valor",
 		"description": "Noble steel knights, radiant sorceresses, and living fortress colossi.",
-		"light_square": Color(0.82, 0.84, 0.88, 1.0),
-		"dark_square": Color(0.24, 0.28, 0.36, 1.0),
+		"light_square": Color(0.93, 0.91, 0.85, 1.0),
+		"dark_square": Color(0.11, 0.12, 0.14, 1.0),
 		"accent": Color(0.95, 0.8, 0.25, 1.0),
 		"arena_bg": Color(0.12, 0.14, 0.18, 1.0)
 	},

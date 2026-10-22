@@ -12,9 +12,6 @@ extends Control
 @onready var def_hp_bar: ProgressBar = $SafeArea/CombatantBars/DefenderBox/HPBar
 @onready var def_symbol_label: Label = $SafeArea/CombatantBars/DefenderBox/IconLabel
 
-@onready var virtual_joystick: VirtualJoystick = $SafeArea/TouchControls/VirtualJoystick
-@onready var touch_buttons: TouchActionButtons = $SafeArea/TouchControls/TouchActionButtons
-
 func _ready() -> void:
 	EventBus.duel_triggered.connect(_on_duel_triggered)
 	EventBus.duel_health_changed.connect(_on_health_changed)

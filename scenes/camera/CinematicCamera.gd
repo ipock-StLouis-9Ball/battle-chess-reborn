@@ -3,19 +3,19 @@ extends Camera3D
 
 ## Heroic 3D Isometric & Action Duel Camera
 ## - Recreates the iconic 1988 perspective with stationary isometric overview:
-##   * Position: Vector3(0.0, 24.5, 29.5)
-##   * Pitch: Vector3(-38.5, 0.0, 0.0) (~38.5° elevation angle looking down at board center)
-##   * FOV: 38.0 (frames the entire 25.4m dais, plinths, and braziers without distortion)
-##   * White at bottom of screen, Black at top of screen
+##   * Position: Vector3(0.0, 25.0, 25.0)
+##   * Pitch: Vector3(-45.0, 0.0, 0.0) aimed directly at board center Vector3(0, 0, 0)
+##   * FOV: 38.0 (frames the entire 8x8 board and all 4 borders cleanly with margins)
+##   * Player 1 (Blue/Silver) at bottom of screen, Player 2 (Red/Bronze) at top of screen
 ## - Targeted square zoom on capture execution:
-##   * Smoothly tweens in 0.4s to Vector3(sq_x, 4.2, sq_z + 6.2) looking at Vector3(sq_x, 1.4, sq_z)
+##   * Smoothly tweens in 0.4s to Vector3(sq_x, 4.5, sq_z + 4.5) looking at Vector3(sq_x, 1.0, sq_z)
 ##   * Smoothly returns to stationary overview in 0.5s at duel conclusion
 
-@export var base_elevation_angle: float = 38.5 # Classic ~38.5° elevation pitch
+@export var base_elevation_angle: float = 45.0 # Iconic isometric pitch
 @export var base_fov: float = 38.0
 
-var base_pos: Vector3 = Vector3(0.0, 24.5, 29.5)
-var base_rot: Vector3 = Vector3(-38.5, 0.0, 0.0)
+var base_pos: Vector3 = Vector3(0.0, 25.0, 25.0)
+var base_rot: Vector3 = Vector3(-45.0, 0.0, 0.0)
 
 var is_in_duel: bool = false
 var active_tween: Tween
@@ -76,9 +76,9 @@ func zoom_to_square(sq_x: float, sq_z: float, duration: float = 0.4) -> void:
 	if active_tween and active_tween.is_valid():
 		active_tween.kill()
 
-	# Looking directly at Vector3(sq_x, 1.4, sq_z) from Vector3(sq_x, 4.2, sq_z + 6.2)
-	var focus_pos = Vector3(sq_x, 4.2, sq_z + 6.2)
-	var focus_rot = Vector3(-24.3, 0.0, 0.0)
+	# Looking directly at Vector3(sq_x, 1.0, sq_z) from Vector3(sq_x, 4.5, sq_z + 4.5)
+	var focus_pos = Vector3(sq_x, 4.5, sq_z + 4.5)
+	var focus_rot = Vector3(-45.0, 0.0, 0.0)
 
 	active_tween = create_tween().set_parallel(true).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
 	active_tween.tween_property(self, "position", focus_pos, duration)

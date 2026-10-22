@@ -257,18 +257,18 @@ func _update_tile_materials() -> void:
 	if has_node("/root/ThemeManager"):
 		theme_data = get_node("/root/ThemeManager").get_current_theme_data()
 
-	var light_col = theme_data.get("light_square", Color(0.88, 0.9, 0.95))
-	var dark_col = theme_data.get("dark_square", Color(0.18, 0.22, 0.3))
+	var light_col = theme_data.get("light_square", Color(0.93, 0.91, 0.85))
+	var dark_col = theme_data.get("dark_square", Color(0.11, 0.12, 0.14))
 
 	var mat_light = StandardMaterial3D.new()
 	mat_light.albedo_color = light_col
-	mat_light.roughness = 0.3
-	mat_light.metallic = 0.25
+	mat_light.roughness = 0.28
+	mat_light.metallic = 0.08
 
 	var mat_dark = StandardMaterial3D.new()
 	mat_dark.albedo_color = dark_col
-	mat_dark.roughness = 0.35
-	mat_dark.metallic = 0.35
+	mat_dark.roughness = 0.22
+	mat_dark.metallic = 0.18
 
 	for pos in tile_areas.keys():
 		var is_dark = ((pos.x + pos.y) % 2 == 1)

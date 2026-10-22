@@ -346,14 +346,16 @@ print("Generator module loaded successfully")
 # 1. FANTASY THEME MODELS
 # ==========================================
 FANTASY_MATERIALS = [
-    # 0: Polished Steel
-    {'name': 'PolishedSteel', 'pbrMetallicRoughness': {'baseColorFactor': [0.85, 0.88, 0.92, 1.0], 'metallicFactor': 0.82, 'roughnessFactor': 0.25}},
+    # 0: Polished Silver Steel
+    {'name': 'PolishedSteel', 'pbrMetallicRoughness': {'baseColorFactor': [0.88, 0.90, 0.94, 1.0], 'metallicFactor': 0.82, 'roughnessFactor': 0.22}},
     # 1: Imperial Gold Trim
-    {'name': 'ImperialGold', 'pbrMetallicRoughness': {'baseColorFactor': [0.98, 0.80, 0.22, 1.0], 'metallicFactor': 0.90, 'roughnessFactor': 0.20}},
-    # 2: Royal Blue Fabric / Mantle
-    {'name': 'RoyalBlueMantle', 'pbrMetallicRoughness': {'baseColorFactor': [0.12, 0.25, 0.72, 1.0], 'metallicFactor': 0.10, 'roughnessFactor': 0.75}},
-    # 3: Deep Red Ermine / Gemstone
-    {'name': 'RoyalCrimson', 'pbrMetallicRoughness': {'baseColorFactor': [0.72, 0.08, 0.14, 1.0], 'metallicFactor': 0.15, 'roughnessFactor': 0.65}}
+    {'name': 'ImperialGold', 'pbrMetallicRoughness': {'baseColorFactor': [0.95, 0.80, 0.22, 1.0], 'metallicFactor': 0.90, 'roughnessFactor': 0.20}},
+    # 2: Royal Sapphire Blue (Player 1 Faction)
+    {'name': 'RoyalSapphireBlue', 'pbrMetallicRoughness': {'baseColorFactor': [0.12, 0.28, 0.78, 1.0], 'metallicFactor': 0.15, 'roughnessFactor': 0.55}},
+    # 3: Crimson Ruby Red (Player 2 Faction)
+    {'name': 'CrimsonRubyRed', 'pbrMetallicRoughness': {'baseColorFactor': [0.75, 0.10, 0.14, 1.0], 'metallicFactor': 0.15, 'roughnessFactor': 0.55}},
+    # 4: Dark Bronze / Obsidian
+    {'name': 'DarkBronzeObsidian', 'pbrMetallicRoughness': {'baseColorFactor': [0.18, 0.16, 0.16, 1.0], 'metallicFactor': 0.78, 'roughnessFactor': 0.32}}
 ]
 
 def add_fantasy_pedestal(mb):
@@ -361,153 +363,172 @@ def add_fantasy_pedestal(mb):
     add_cylinder(mb, 0, 0.0, 0.06, 0.0, 0.42, 0.38, 0.12, segs=16)
     add_cylinder(mb, 1, 0.0, 0.13, 0.0, 0.39, 0.36, 0.03, segs=16)
 
-def build_fantasy_paladin(mb):
+def build_fantasy_pawn_infantry(mb):
     add_fantasy_pedestal(mb)
-    # Legs
-    add_cylinder(mb, 0, -0.11, 0.32, 0.0, 0.08, 0.07, 0.32, segs=10)
-    add_cylinder(mb, 0, 0.11, 0.32, 0.0, 0.08, 0.07, 0.32, segs=10)
-    # Pelvis & blue tabard
-    add_box(mb, 2, 0.0, 0.50, 0.0, 0.30, 0.18, 0.22)
-    # Steel breastplate
+    # Armored Greaves / Legs
+    add_cylinder(mb, 0, -0.11, 0.30, 0.0, 0.08, 0.07, 0.30, segs=10)
+    add_cylinder(mb, 0, 0.11, 0.30, 0.0, 0.08, 0.07, 0.30, segs=10)
+    # Pelvis & Royal Sapphire Tabard
+    add_box(mb, 2, 0.0, 0.48, 0.0, 0.30, 0.18, 0.22)
+    # Polished Steel Breastplate
     add_box(mb, 0, 0.0, 0.68, 0.0, 0.34, 0.24, 0.24)
-    # Gold pectoral cross
+    # Gold Pectoral Cross / Trim
     add_box(mb, 1, 0.0, 0.70, 0.13, 0.06, 0.18, 0.02)
     add_box(mb, 1, 0.0, 0.72, 0.13, 0.18, 0.06, 0.02)
-    # Pauldrons
+    # Articulated Shoulder Pauldrons
     add_box(mb, 0, -0.24, 0.78, 0.0, 0.14, 0.12, 0.20, rz=0.25)
     add_box(mb, 0, 0.24, 0.78, 0.0, 0.14, 0.12, 0.20, rz=-0.25)
     add_box(mb, 1, -0.24, 0.81, 0.0, 0.15, 0.04, 0.21, rz=0.25)
     add_box(mb, 1, 0.24, 0.81, 0.0, 0.15, 0.04, 0.21, rz=-0.25)
-    # Great helm
+    # Helmeted Head with Crest
     add_cylinder(mb, 0, 0.0, 0.95, 0.0, 0.14, 0.13, 0.20, segs=12)
     add_box(mb, 1, 0.0, 1.07, 0.0, 0.04, 0.08, 0.22)
-    # Helm eye slit
-    add_box(mb, 3, 0.0, 0.96, 0.13, 0.16, 0.03, 0.02)
-    # Right arm & spear
+    # Helm Visor Slit
+    add_box(mb, 1, 0.0, 0.96, 0.13, 0.16, 0.03, 0.02)
+    # Articulated Right Arm & Spear/Shortsword
     add_box(mb, 0, 0.24, 0.60, 0.05, 0.08, 0.22, 0.08)
-    add_cylinder(mb, 1, 0.27, 0.75, 0.14, 0.02, 0.02, 1.35, segs=8)
-    add_cone(mb, 0, 0.27, 1.48, 0.14, 0.06, 0.20, segs=8)
-    # Left arm & kite shield
+    add_cylinder(mb, 1, 0.27, 0.75, 0.14, 0.02, 0.02, 1.10, segs=8)
+    add_cone(mb, 0, 0.27, 1.35, 0.14, 0.06, 0.18, segs=8)
+    add_box(mb, 1, 0.27, 0.72, 0.14, 0.12, 0.02, 0.04) # crossguard
+    # Articulated Left Arm & Heater Shield
     add_box(mb, 0, -0.24, 0.60, 0.05, 0.08, 0.22, 0.08)
     add_box(mb, 2, -0.30, 0.62, 0.12, 0.04, 0.42, 0.26, ry=0.2)
     add_box(mb, 1, -0.32, 0.64, 0.12, 0.02, 0.32, 0.05, ry=0.2)
     add_box(mb, 1, -0.32, 0.68, 0.12, 0.02, 0.05, 0.18, ry=0.2)
 
-def build_fantasy_goblin(mb):
-    add_fantasy_pedestal(mb)
-    # Crouched nimble legs
-    add_cylinder(mb, 2, -0.12, 0.26, -0.05, 0.07, 0.06, 0.24, rx=0.4)
-    add_cylinder(mb, 2, 0.12, 0.26, -0.05, 0.07, 0.06, 0.24, rx=0.4)
-    # Forward-hunched torso
-    add_box(mb, 0, 0.0, 0.46, 0.06, 0.28, 0.26, 0.22, rx=0.35)
-    # Pointed goblin head jutting forward
-    add_box(mb, 0, 0.0, 0.68, 0.18, 0.22, 0.20, 0.20, rx=0.15)
-    # Large pointed ears
-    add_cone(mb, 0, -0.20, 0.72, 0.16, 0.06, 0.24, rz=1.2, rx=0.2)
-    add_cone(mb, 0, 0.20, 0.72, 0.16, 0.06, 0.24, rz=-1.2, rx=0.2)
-    # Snout / chin
-    add_cone(mb, 0, 0.0, 0.64, 0.32, 0.05, 0.12, rx=-1.4)
-    # Glowing predatory yellow eyes
-    add_sphere(mb, 1, -0.06, 0.70, 0.28, 0.035)
-    add_sphere(mb, 1, 0.06, 0.70, 0.28, 0.035)
-    # Dual curved jagged scimitars
-    add_box(mb, 0, 0.25, 0.68, 0.16, 0.03, 0.40, 0.07, rx=0.45, rz=-0.3)
-    add_box(mb, 0, -0.25, 0.48, -0.04, 0.03, 0.36, 0.06, rx=-0.5, rz=0.25)
-    # Spiked leather pauldrons
-    add_cone(mb, 1, -0.18, 0.58, 0.04, 0.05, 0.12, rz=0.7)
-    add_cone(mb, 1, 0.18, 0.58, 0.04, 0.05, 0.12, rz=-0.7)
+def build_fantasy_rook_golem(mb):
+    # Sturdy Heavy Plinth
+    add_cylinder(mb, 0, 0.0, 0.06, 0.0, 0.48, 0.45, 0.12, segs=16)
+    add_cylinder(mb, 1, 0.0, 0.13, 0.0, 0.45, 0.42, 0.03, segs=16)
+    # Hulking Pillar Legs
+    add_box(mb, 0, -0.18, 0.32, 0.0, 0.20, 0.34, 0.22)
+    add_box(mb, 0, 0.18, 0.32, 0.0, 0.20, 0.34, 0.22)
+    # Broad Hulking Torso
+    add_box(mb, 0, 0.0, 0.68, 0.0, 0.52, 0.42, 0.38)
+    add_box(mb, 1, 0.0, 0.70, 0.20, 0.24, 0.22, 0.03) # Iron crest
+    # Battlement Shoulder Pauldrons (Crenellated Fortress Tops)
+    add_box(mb, 0, -0.36, 0.88, 0.0, 0.24, 0.24, 0.30)
+    add_box(mb, 0, 0.36, 0.88, 0.0, 0.24, 0.24, 0.30)
+    for ox in [-0.36, 0.36]:
+        add_box(mb, 1, ox - 0.08, 1.03, -0.10, 0.06, 0.08, 0.06)
+        add_box(mb, 1, ox + 0.08, 1.03, -0.10, 0.06, 0.08, 0.06)
+        add_box(mb, 1, ox - 0.08, 1.03, 0.10, 0.06, 0.08, 0.06)
+        add_box(mb, 1, ox + 0.08, 1.03, 0.10, 0.06, 0.08, 0.06)
+    # Deep-Set Head nestled between pauldrons
+    add_box(mb, 0, 0.0, 0.90, 0.04, 0.24, 0.20, 0.24)
+    # Glowing Golem Eyes
+    add_box(mb, 1, -0.06, 0.92, 0.17, 0.04, 0.03, 0.02)
+    add_box(mb, 1, 0.06, 0.92, 0.17, 0.04, 0.03, 0.02)
+    # Heavy Dual Fists & Warhammer
+    add_box(mb, 0, 0.34, 0.52, 0.10, 0.14, 0.35, 0.14)
+    add_box(mb, 0, -0.34, 0.52, 0.10, 0.14, 0.35, 0.14)
+    add_cylinder(mb, 1, 0.24, 0.70, 0.22, 0.025, 0.025, 0.95, segs=8, rz=-0.3, rx=0.2)
+    add_box(mb, 0, 0.38, 0.98, 0.28, 0.18, 0.24, 0.22, rz=-0.3)
+    add_box(mb, 1, 0.38, 0.98, 0.28, 0.20, 0.04, 0.24, rz=-0.3)
 
-def build_fantasy_sorcerer(mb):
+def build_fantasy_knight_cavalier(mb):
     add_fantasy_pedestal(mb)
-    # Cascading flowing wizard robe
-    add_cylinder(mb, 2, 0.0, 0.38, 0.0, 0.34, 0.22, 0.50, segs=14)
-    add_cylinder(mb, 2, 0.0, 0.72, 0.0, 0.22, 0.17, 0.34, segs=12)
-    # Gold decorative hem & sash
-    add_box(mb, 1, 0.0, 0.45, 0.22, 0.06, 0.55, 0.02)
-    # Sorcerer head & beard
-    add_sphere(mb, 0, 0.0, 0.96, 0.0, 0.13)
-    # Conical wizard hat with wide brim
-    add_cylinder(mb, 2, 0.0, 1.04, 0.0, 0.28, 0.28, 0.03, segs=14)
-    add_cone(mb, 2, 0.0, 1.28, -0.04, 0.19, 0.46, segs=12, rx=-0.22)
-    add_cylinder(mb, 1, 0.0, 1.07, 0.0, 0.20, 0.18, 0.04, segs=12)
-    # Arcane darkwood staff with crescent prongs
-    add_cylinder(mb, 0, 0.26, 0.78, 0.12, 0.025, 0.025, 1.40, segs=8)
-    add_cylinder(mb, 1, 0.26, 1.50, 0.12, 0.11, 0.11, 0.03, segs=10, rx=1.57)
-    # Floating glowing magical orb
-    add_sphere(mb, 1, 0.26, 1.55, 0.12, 0.09, rings=8, segs=12)
-    # Grimoire spellbook at hip
-    add_box(mb, 3, -0.25, 0.65, 0.12, 0.20, 0.26, 0.06, ry=0.4, rx=0.2)
-    add_box(mb, 1, -0.25, 0.65, 0.12, 0.18, 0.24, 0.04, ry=0.4, rx=0.2)
+    # Armored Cavalry Legs
+    add_cylinder(mb, 0, -0.11, 0.32, 0.0, 0.08, 0.07, 0.32, segs=10)
+    add_cylinder(mb, 0, 0.11, 0.32, 0.0, 0.08, 0.07, 0.32, segs=10)
+    # Steel Breastplate & Gorget
+    add_box(mb, 0, 0.0, 0.68, 0.0, 0.34, 0.26, 0.24)
+    add_box(mb, 1, 0.0, 0.72, 0.13, 0.12, 0.12, 0.02) # Knight badge
+    # Flowing Cavalry Cape
+    add_box(mb, 2, 0.0, 0.55, -0.14, 0.36, 0.55, 0.04, rx=-0.08)
+    # Curved Shoulder Pauldrons
+    add_box(mb, 0, -0.24, 0.80, 0.0, 0.14, 0.12, 0.22, rz=0.2)
+    add_box(mb, 0, 0.24, 0.80, 0.0, 0.14, 0.12, 0.22, rz=-0.2)
+    add_box(mb, 1, -0.24, 0.84, 0.0, 0.15, 0.04, 0.23, rz=0.2)
+    add_box(mb, 1, 0.24, 0.84, 0.0, 0.15, 0.04, 0.23, rz=-0.2)
+    # Plumed Visored Knight Helmet
+    add_cylinder(mb, 0, 0.0, 0.96, 0.0, 0.14, 0.13, 0.22, segs=12)
+    add_box(mb, 1, 0.0, 0.96, 0.13, 0.15, 0.03, 0.02) # Visor slit
+    # Plume Crest flowing backwards
+    add_box(mb, 2, 0.0, 1.10, -0.06, 0.05, 0.16, 0.26, rx=0.2)
+    add_cone(mb, 2, 0.0, 1.20, -0.16, 0.06, 0.24, rx=-0.8)
+    # Right Arm & Broadsword
+    add_box(mb, 0, 0.24, 0.60, 0.05, 0.08, 0.22, 0.08)
+    add_box(mb, 0, 0.27, 0.82, 0.20, 0.05, 0.65, 0.12, rx=0.2) # blade
+    add_box(mb, 1, 0.27, 0.52, 0.15, 0.14, 0.03, 0.05, rx=0.2) # crossguard
+    add_cylinder(mb, 1, 0.27, 0.44, 0.13, 0.02, 0.02, 0.14, rx=0.2) # grip & pommel
+    # Left Arm & Cavalry Shield
+    add_box(mb, 0, -0.24, 0.60, 0.05, 0.08, 0.22, 0.08)
+    add_box(mb, 2, -0.30, 0.64, 0.14, 0.04, 0.46, 0.28, ry=0.25)
+    add_box(mb, 1, -0.32, 0.66, 0.14, 0.02, 0.40, 0.06, ry=0.25)
+    add_box(mb, 1, -0.32, 0.70, 0.14, 0.02, 0.06, 0.22, ry=0.25)
 
-def build_fantasy_dragon_rook(mb):
-    # Fortified octagonal bastion
-    add_cylinder(mb, 0, 0.0, 0.08, 0.0, 0.46, 0.44, 0.16, segs=8)
-    add_cylinder(mb, 0, 0.0, 0.60, 0.0, 0.38, 0.33, 0.90, segs=8)
-    add_cylinder(mb, 0, 0.0, 1.10, 0.0, 0.33, 0.42, 0.12, segs=8)
-    # 4 corner crenellated battlements
-    for ox, oz in [(-0.30, -0.30), (0.30, -0.30), (-0.30, 0.30), (0.30, 0.30)]:
-        add_box(mb, 0, ox, 1.22, oz, 0.14, 0.18, 0.14)
-    # Molten lava core glowing inside parapet
-    add_cylinder(mb, 1, 0.0, 1.16, 0.0, 0.24, 0.24, 0.06, segs=8)
-    # Dragon horns jutting from parapet
-    add_cone(mb, 1, -0.28, 1.32, 0.0, 0.08, 0.34, segs=8, rz=0.4, rx=0.2)
-    add_cone(mb, 1, 0.28, 1.32, 0.0, 0.08, 0.34, segs=8, rz=-0.4, rx=0.2)
-    # Gargoyle wings flanking tower
-    add_box(mb, 0, -0.36, 0.72, -0.04, 0.05, 0.50, 0.28, ry=0.3, rz=-0.2)
-    add_box(mb, 0, 0.36, 0.72, -0.04, 0.05, 0.50, 0.28, ry=-0.3, rz=0.2)
-    # Portcullis archway
-    add_box(mb, 1, 0.0, 0.30, 0.36, 0.16, 0.28, 0.04)
-
-def build_fantasy_queen(mb):
+def build_fantasy_bishop_cleric(mb):
     add_fantasy_pedestal(mb)
-    # Flared ballgown
+    # Flowing Clerical Robes
+    add_cylinder(mb, 2, 0.0, 0.38, 0.0, 0.36, 0.24, 0.50, segs=16)
+    add_cylinder(mb, 2, 0.0, 0.72, 0.0, 0.24, 0.18, 0.34, segs=14)
+    # Liturgical Stole / Shoulder Trim
+    add_box(mb, 1, -0.07, 0.56, 0.19, 0.05, 0.55, 0.02)
+    add_box(mb, 1, 0.07, 0.56, 0.19, 0.05, 0.55, 0.02)
+    add_box(mb, 1, 0.0, 0.84, 0.0, 0.38, 0.08, 0.22) # stole collar
+    # Mitre / Hooded Head
+    add_sphere(mb, 0, 0.0, 0.95, 0.0, 0.12)
+    add_cylinder(mb, 2, 0.0, 1.05, 0.0, 0.15, 0.16, 0.14, segs=12)
+    add_cone(mb, 2, 0.0, 1.20, 0.0, 0.15, 0.24, segs=12)
+    add_box(mb, 1, 0.0, 1.15, 0.14, 0.04, 0.16, 0.02) # Gold cross on mitre
+    add_box(mb, 1, 0.0, 1.18, 0.14, 0.12, 0.04, 0.02)
+    # Ornate Crosier Battle Staff
+    add_cylinder(mb, 1, 0.26, 0.80, 0.12, 0.025, 0.025, 1.45, segs=8)
+    add_cylinder(mb, 1, 0.26, 1.55, 0.12, 0.10, 0.10, 0.03, segs=12, rx=1.57) # crook loop
+    add_sphere(mb, 1, 0.26, 1.62, 0.12, 0.07) # embedded gem
+    # Holy Reliquary at hip
+    add_box(mb, 3, -0.24, 0.62, 0.10, 0.16, 0.22, 0.06, ry=0.3)
+    add_box(mb, 1, -0.24, 0.62, 0.10, 0.14, 0.20, 0.04, ry=0.3)
+
+def build_fantasy_queen_sorceress(mb):
+    add_fantasy_pedestal(mb)
+    # Flared Armored Ballgown
     add_cylinder(mb, 0, 0.0, 0.35, 0.0, 0.42, 0.25, 0.50, segs=16)
     add_cylinder(mb, 2, 0.0, 0.70, 0.0, 0.23, 0.17, 0.30, segs=14)
     add_cylinder(mb, 1, 0.0, 0.58, 0.0, 0.24, 0.24, 0.04, segs=14)
-    # Velvet shoulders & chest
-    add_box(mb, 2, 0.0, 0.90, -0.04, 0.38, 0.16, 0.18)
-    # Queen head
-    add_sphere(mb, 0, 0.0, 1.12, 0.0, 0.12)
-    # 5-pointed coronet crown
-    add_cylinder(mb, 1, 0.0, 1.25, 0.0, 0.15, 0.16, 0.08, segs=12)
+    # Royal Bodice & Corset Armor
+    add_box(mb, 0, 0.0, 0.88, 0.0, 0.32, 0.20, 0.20)
+    add_box(mb, 1, 0.0, 0.88, 0.11, 0.12, 0.18, 0.02)
+    # Royal Cape draping behind
+    add_box(mb, 2, 0.0, 0.60, -0.14, 0.38, 0.62, 0.04, rx=-0.08)
+    # Queen Head
+    add_sphere(mb, 0, 0.0, 1.10, 0.0, 0.12)
+    # High Gold Crown with 5 Spire Points
+    add_cylinder(mb, 1, 0.0, 1.22, 0.0, 0.14, 0.16, 0.08, segs=12)
     for i in range(5):
         ang = 2.0 * math.pi * i / 5.0
         cx = math.cos(ang) * 0.15
         cz = math.sin(ang) * 0.15
-        add_cone(mb, 1, cx, 1.34, cz, 0.03, 0.12)
-    # Sapphire gem on crown
-    add_sphere(mb, 2, 0.0, 1.26, 0.16, 0.035)
-    # Golden royal scepter in hand
-    add_cylinder(mb, 1, 0.28, 0.88, 0.14, 0.02, 0.02, 0.80, segs=8)
-    add_sphere(mb, 1, 0.28, 1.32, 0.14, 0.06)
+        add_cone(mb, 1, cx, 1.32, cz, 0.03, 0.14)
+    # Arcane Royal Scepter
+    add_cylinder(mb, 1, 0.28, 0.88, 0.14, 0.02, 0.02, 0.85, segs=8)
+    add_sphere(mb, 1, 0.28, 1.34, 0.14, 0.07)
 
-def build_fantasy_king(mb):
-    # Stately wide pedestal
-    add_cylinder(mb, 0, 0.0, 0.06, 0.0, 0.45, 0.42, 0.12, segs=16)
-    add_cylinder(mb, 1, 0.0, 0.13, 0.0, 0.42, 0.39, 0.03, segs=16)
-    # Crimson ermine robe drape
-    add_cylinder(mb, 3, 0.0, 0.45, 0.0, 0.43, 0.28, 0.68, segs=16)
-    # Heavy armored cuirass
+def build_fantasy_king_monarch(mb):
+    add_fantasy_pedestal(mb)
+    # Broad Royal Mantle
+    add_cylinder(mb, 2, 0.0, 0.45, 0.0, 0.44, 0.28, 0.68, segs=16)
+    # Heavy Armored Cuirass
     add_box(mb, 0, 0.0, 0.86, 0.0, 0.42, 0.32, 0.26)
-    # Imperial gold crest
-    add_box(mb, 1, 0.0, 0.88, 0.14, 0.16, 0.20, 0.02)
-    # Heavy pauldrons
+    add_box(mb, 1, 0.0, 0.88, 0.14, 0.16, 0.20, 0.02) # Imperial gold crest
+    # Heavy Pauldrons
     add_box(mb, 1, -0.26, 0.98, 0.0, 0.18, 0.15, 0.24)
     add_box(mb, 1, 0.26, 0.98, 0.0, 0.18, 0.15, 0.24)
-    # Fur collar
-    add_cylinder(mb, 3, 0.0, 1.08, 0.0, 0.25, 0.21, 0.10, segs=14)
-    # King head & beard
+    # Fur / Ermine Collar
+    add_cylinder(mb, 0, 0.0, 1.08, 0.0, 0.25, 0.21, 0.10, segs=14)
+    # Bearded / Visored Monarch Head
     add_sphere(mb, 0, 0.0, 1.22, 0.0, 0.14)
-    # Imperial Closed Crown
+    # Ornate Imperial Gold Crown
     add_cylinder(mb, 1, 0.0, 1.36, 0.0, 0.17, 0.18, 0.08, segs=14)
-    add_sphere(mb, 3, 0.0, 1.44, 0.0, 0.15)
-    # Crown cross finial
+    add_sphere(mb, 2, 0.0, 1.44, 0.0, 0.15)
+    # Crown Cross Finial
     add_box(mb, 1, 0.0, 1.62, 0.0, 0.03, 0.14, 0.03)
     add_box(mb, 1, 0.0, 1.64, 0.0, 0.10, 0.03, 0.03)
-    # Masterwork claymore sword point-down into pedestal
-    add_box(mb, 0, 0.0, 0.52, 0.28, 0.06, 0.70, 0.02)
-    add_box(mb, 1, 0.0, 0.88, 0.28, 0.26, 0.04, 0.04)
-    add_cylinder(mb, 1, 0.0, 0.98, 0.28, 0.02, 0.02, 0.16)
+    # Two-Handed Royal Greatsword
+    add_box(mb, 0, 0.0, 0.52, 0.28, 0.07, 0.75, 0.03) # blade
+    add_box(mb, 1, 0.0, 0.92, 0.28, 0.28, 0.04, 0.04) # crossguard
+    add_cylinder(mb, 1, 0.0, 1.02, 0.28, 0.022, 0.022, 0.18) # grip & pommel
 
 
 # ==========================================
@@ -845,12 +866,17 @@ PIPELINE = {
     'fantasy': {
         'materials': FANTASY_MATERIALS,
         'pieces': [
-            ('pawn', 'paladin', build_fantasy_paladin),
-            ('knight', 'goblin', build_fantasy_goblin),
-            ('bishop', 'sorcerer', build_fantasy_sorcerer),
-            ('rook', 'dragon_rook', build_fantasy_dragon_rook),
-            ('queen', 'queen', build_fantasy_queen),
-            ('king', 'king', build_fantasy_king),
+            ('pawn', 'pawn', build_fantasy_pawn_infantry),
+            ('rook', 'rook', build_fantasy_rook_golem),
+            ('knight', 'knight', build_fantasy_knight_cavalier),
+            ('bishop', 'bishop', build_fantasy_bishop_cleric),
+            ('queen', 'queen', build_fantasy_queen_sorceress),
+            ('king', 'king', build_fantasy_king_monarch),
+            # Legacy alias names to ensure 100% backward compatibility
+            ('pawn', 'paladin', build_fantasy_pawn_infantry),
+            ('rook', 'dragon_rook', build_fantasy_rook_golem),
+            ('knight', 'goblin', build_fantasy_knight_cavalier),
+            ('bishop', 'sorcerer', build_fantasy_bishop_cleric),
         ]
     },
     'cyberpunk': {
