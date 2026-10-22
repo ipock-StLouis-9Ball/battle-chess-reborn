@@ -2,12 +2,12 @@
 
 [ext_resource type="Script" path="res://scripts/themes/PieceTheme.gd" id="1_ptheme"]
 [ext_resource type="Material" uid="uid://mat_board_cyberpunk_001" path="res://assets/materials/mat_board_cyberpunk.tres" id="2_bmat"]
-[ext_resource type="BoxMesh" uid="uid://mesh_cp_pawn_001" path="res://assets/models/cyberpunk/mesh_cp_pawn.tres" id="3_pawn"]
-[ext_resource type="PrismMesh" uid="uid://mesh_cp_knight_001" path="res://assets/models/cyberpunk/mesh_cp_knight.tres" id="4_knight"]
-[ext_resource type="CylinderMesh" uid="uid://mesh_cp_bishop_001" path="res://assets/models/cyberpunk/mesh_cp_bishop.tres" id="5_bishop"]
-[ext_resource type="BoxMesh" uid="uid://mesh_cp_rook_001" path="res://assets/models/cyberpunk/mesh_cp_rook.tres" id="6_rook"]
-[ext_resource type="CapsuleMesh" uid="uid://mesh_cp_queen_001" path="res://assets/models/cyberpunk/mesh_cp_queen.tres" id="7_queen"]
-[ext_resource type="BoxMesh" uid="uid://mesh_cp_king_001" path="res://assets/models/cyberpunk/mesh_cp_king.tres" id="8_king"]
+[ext_resource type="PackedScene" uid="uid://glb_cp_pawn_001" path="res://assets/models/cyberpunk/pawn.glb" id="3_pawn"]
+[ext_resource type="PackedScene" uid="uid://glb_cp_knight_001" path="res://assets/models/cyberpunk/knight.glb" id="4_knight"]
+[ext_resource type="PackedScene" uid="uid://glb_cp_bishop_001" path="res://assets/models/cyberpunk/bishop.glb" id="5_bishop"]
+[ext_resource type="PackedScene" uid="uid://glb_cp_rook_001" path="res://assets/models/cyberpunk/rook.glb" id="6_rook"]
+[ext_resource type="PackedScene" uid="uid://glb_cp_queen_001" path="res://assets/models/cyberpunk/queen.glb" id="7_queen"]
+[ext_resource type="PackedScene" uid="uid://glb_cp_king_001" path="res://assets/models/cyberpunk/king.glb" id="8_king"]
 [ext_resource type="Material" uid="uid://mat_piece_white_001" path="res://assets/materials/mat_piece_white.tres" id="9_wmat"]
 [ext_resource type="Material" uid="uid://mat_piece_black_001" path="res://assets/materials/mat_piece_black.tres" id="10_bmat"]
 

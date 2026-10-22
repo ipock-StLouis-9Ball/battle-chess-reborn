@@ -2,9 +2,10 @@ class_name Piece3D
 extends Node3D
 
 ## Heroic 3D Combat Chess Piece
-## - Scaled gladiator character standing ~1.8x to 2.2x tile width (4.5m - 5.5m tall)
-## - 3D raycast touch picking colliders and emissive glowing selection ring
-## - Bone attachment sockets (Hand_R_Socket, Head_Socket)
+## - Articulated 3D warrior figurines (GLB models with procedural anatomical fallbacks)
+## - PBR noble steel/gold (White) and obsidian/iron (Black) with zero blinding emission
+## - 3D raycast touch picking colliders and soft halo selection ring
+## - Bone/weapon attachment sockets (Hand_R_Socket, Head_Socket)
 ## - 3-Act choreographed battle animations:
 ##   * Act 1: Heavy Opening Strike & Defensive Block/Parry
 ##   * Act 2: Retaliation Counter-Blow & Sidestep Evade/Deflect
@@ -18,22 +19,34 @@ signal movement_finished()
 @export var piece_color: String = "white" # "white" or "black"
 @export var board_pos: Vector2i = Vector2i.ZERO
 
-@onready var mesh_instance: MeshInstance3D = $MeshInstance3D
-@onready var hand_r_socket: Marker3D = $Hand_R_Socket
-@onready var head_socket: Marker3D = $Head_Socket
-@onready var selection_ring: MeshInstance3D = $SelectionRing
-@onready var pick_area: Area3D = $PickArea
+@onready var model_root: Node3D = $ModelRoot if has_node("ModelRoot") else null
+@onready var mesh_instance: MeshInstance3D = $MeshInstance3D if has_node("MeshInstance3D") else null
+@onready var hand_r_socket: Marker3D = $Hand_R_Socket if has_node("Hand_R_Socket") else null
+@onready var head_socket: Marker3D = $Head_Socket if has_node("Head_Socket") else null
+@onready var selection_ring: MeshInstance3D = $SelectionRing if has_node("SelectionRing") else null
+@onready var pick_area: Area3D = $PickArea if has_node("PickArea") else null
 
 var current_tween: Tween
 var active_theme: Resource = null
 var is_selected: bool = false
 var base_scale: Vector3 = Vector3.ONE
 var ring_tween: Tween
+var active_model_instance: Node3D = null
 
 func _ready() -> void:
+	if model_root == null:
+		model_root = Node3D.new()
+		model_root.name = "ModelRoot"
+		add_child(model_root)
+
+	# Hide or clear legacy primitive mesh if present
+	if is_instance_valid(mesh_instance):
+		mesh_instance.visible = false
+		mesh_instance.mesh = null
+
 	_init_heroic_scale()
 	_setup_picking()
-	_update_materials()
+	_load_or_build_model()
 	set_selected(false)
 
 func get_target_height() -> float:
@@ -62,75 +75,294 @@ func setup(type: String, color: String, theme_res: Resource = null) -> void:
 	if theme_res != null:
 		apply_theme(theme_res)
 	else:
-		_update_materials()
+		_load_or_build_model()
 
 func apply_theme(theme_res: Resource) -> void:
 	active_theme = theme_res
-	if theme_res == null or not is_instance_valid(mesh_instance):
-		return
+	_load_or_build_model()
 
-	var thematic_mesh = theme_res.get_piece_mesh(piece_type)
-	if thematic_mesh is Mesh:
-		mesh_instance.mesh = thematic_mesh
-		_scale_thematic_mesh()
-	elif thematic_mesh is PackedScene:
-		var inst = thematic_mesh.instantiate()
-		var found_mesh: Mesh = null
-		if inst is MeshInstance3D and inst.mesh != null:
-			found_mesh = inst.mesh
+## Load the 3D warrior figurine from theme resource, disk GLB, or procedural anatomical fallback
+func _load_or_build_model() -> void:
+	if model_root == null:
+		if has_node("ModelRoot"):
+			model_root = get_node("ModelRoot") as Node3D
 		else:
-			for child in inst.get_children():
-				if child is MeshInstance3D and child.mesh != null:
-					found_mesh = child.mesh
-					break
-		if found_mesh != null:
-			mesh_instance.mesh = found_mesh
-			_scale_thematic_mesh()
-		inst.queue_free()
+			model_root = Node3D.new()
+			model_root.name = "ModelRoot"
+			add_child(model_root)
 
-	_update_materials()
+	# Clean previous model
+	for child in model_root.get_children():
+		child.queue_free()
+	active_model_instance = null
 
-func _scale_thematic_mesh() -> void:
-	if not is_instance_valid(mesh_instance) or mesh_instance.mesh == null:
-		return
-	var aabb = mesh_instance.mesh.get_aabb()
-	var mesh_h = maxf(0.5, aabb.size.y)
-	var desired_h = get_target_height()
-	var factor = desired_h / mesh_h
-	mesh_instance.scale = Vector3(factor, factor, factor)
-	# Align bottom of mesh to Y = 0
-	mesh_instance.position.y = -aabb.position.y * factor
+	var loaded_model: Node3D = null
+
+	# 1. Try loading from active_theme resource
+	if active_theme != null and active_theme.has_method("get_piece_mesh"):
+		var thematic_res = active_theme.get_piece_mesh(piece_type)
+		if thematic_res != null:
+			loaded_model = _try_instantiate_model(thematic_res)
+
+	# 2. Try direct GLB file on disk
+	if loaded_model == null:
+		var theme_folder = "high_fantasy"
+		if active_theme != null and "theme_name" in active_theme:
+			var tname = str(active_theme.theme_name).to_lower()
+			if "cyber" in tname:
+				theme_folder = "cyberpunk"
+			elif "eldritch" in tname:
+				theme_folder = "eldritch"
+		loaded_model = _try_load_glb_fallback(theme_folder, piece_type)
+
+	# 3. Procedural multi-part warrior figurine fallback (guarantees zero naked cylinders)
+	if loaded_model == null:
+		loaded_model = _build_procedural_warrior_figurine(piece_type, piece_color)
+
+	if loaded_model != null:
+		model_root.add_child(loaded_model)
+		active_model_instance = loaded_model
+		_apply_pbr_materials(loaded_model)
+		_scale_and_center_model(loaded_model)
+
+## Instantiate from PackedScene or Mesh resource
+func _try_instantiate_model(res: Resource) -> Node3D:
+	if res is PackedScene:
+		var inst = res.instantiate()
+		if inst is Node3D:
+			return inst
+	elif res is Mesh:
+		var mi = MeshInstance3D.new()
+		mi.mesh = res
+		return mi
+	return null
+
+## Direct GLB loader fallback via ResourceLoader or runtime GLTF
+func _try_load_glb_fallback(theme_folder: String, p_type: String) -> Node3D:
+	var piece_name = "pawn"
+	match p_type.to_upper():
+		"P": piece_name = "pawn"
+		"N": piece_name = "knight"
+		"B": piece_name = "bishop"
+		"R": piece_name = "rook"
+		"Q": piece_name = "queen"
+		"K": piece_name = "king"
+
+	var glb_path = "res://assets/models/%s/%s.glb" % [theme_folder, piece_name]
+	if ResourceLoader.exists(glb_path):
+		var res = load(glb_path)
+		if res is PackedScene:
+			var inst = res.instantiate()
+			if inst is Node3D:
+				return inst
+
+	# Runtime GLTFDocument fallback
+	var doc = GLTFDocument.new()
+	var state = GLTFState.new()
+	var err = doc.append_from_file(glb_path, state)
+	if err == OK:
+		var scene = doc.generate_scene(state)
+		if scene is Node3D:
+			return scene
+
+	return null
+
+## Construct an articulated, multi-part 3D warrior figurine
+## Pedestal plinth + armored torso + pauldrons + helmet/crest + signature weapons & shields
+func _build_procedural_warrior_figurine(p_type: String, p_color: String) -> Node3D:
+	var warrior = Node3D.new()
+	warrior.name = "ArticulatedWarrior"
+
+	var target_h = get_target_height()
+
+	# Pedestal Base: Beveled plinth
+	var base_inst = MeshInstance3D.new()
+	var base_mesh = CylinderMesh.new()
+	base_mesh.top_radius = 0.85
+	base_mesh.bottom_radius = 0.95
+	base_mesh.height = 0.35
+	base_mesh.radial_segments = 16
+	base_inst.mesh = base_mesh
+	base_inst.position = Vector3(0.0, 0.175, 0.0)
+	warrior.add_child(base_inst)
+
+	# Armored Greaves / Legs
+	var leg_l = MeshInstance3D.new()
+	var leg_r = MeshInstance3D.new()
+	var leg_mesh = CapsuleMesh.new()
+	leg_mesh.radius = 0.22
+	leg_mesh.height = 1.1
+	leg_l.mesh = leg_mesh
+	leg_r.mesh = leg_mesh
+	leg_l.position = Vector3(-0.35, 0.85, 0.0)
+	leg_r.position = Vector3(0.35, 0.85, 0.0)
+	warrior.add_child(leg_l)
+	warrior.add_child(leg_r)
+
+	# Armored Torso / Breastplate
+	var torso_inst = MeshInstance3D.new()
+	var torso_mesh = BoxMesh.new()
+	torso_mesh.size = Vector3(1.1, 1.35, 0.75)
+	torso_inst.mesh = torso_mesh
+	torso_inst.position = Vector3(0.0, 1.95, 0.0)
+	warrior.add_child(torso_inst)
+
+	# Shoulder Pauldrons
+	var pauldron_l = MeshInstance3D.new()
+	var pauldron_r = MeshInstance3D.new()
+	var pauldron_mesh = SphereMesh.new()
+	pauldron_mesh.radius = 0.38
+	pauldron_mesh.height = 0.55
+	pauldron_l.mesh = pauldron_mesh
+	pauldron_r.mesh = pauldron_mesh
+	pauldron_l.position = Vector3(-0.75, 2.45, 0.0)
+	pauldron_r.position = Vector3(0.75, 2.45, 0.0)
+	warrior.add_child(pauldron_l)
+	warrior.add_child(pauldron_r)
+
+	# Helmet / Head
+	var head_inst = MeshInstance3D.new()
+	var head_mesh: Mesh
+	var crest_mesh: Mesh = null
+
+	match p_type.to_upper():
+		"K": # Sovereign King Crown
+			head_mesh = CylinderMesh.new()
+			head_mesh.top_radius = 0.42
+			head_mesh.bottom_radius = 0.38
+			head_mesh.height = 0.75
+		"Q": # Regal Queen Diadem
+			head_mesh = CylinderMesh.new()
+			head_mesh.top_radius = 0.36
+			head_mesh.bottom_radius = 0.34
+			head_mesh.height = 0.72
+		"B": # Sacred Cleric Mitre
+			head_mesh = PrismMesh.new()
+			head_mesh.size = Vector3(0.65, 0.85, 0.55)
+		"N": # Knight Steed Crest
+			head_mesh = BoxMesh.new()
+			head_mesh.size = Vector3(0.65, 0.8, 0.95)
+		"R": # Fortress Battlements
+			head_mesh = BoxMesh.new()
+			head_mesh.size = Vector3(0.9, 0.75, 0.9)
+		_: # Pawn Infantry Barbute Helm
+			head_mesh = SphereMesh.new()
+			head_mesh.radius = 0.38
+			head_mesh.height = 0.65
+
+	head_inst.mesh = head_mesh
+	head_inst.position = Vector3(0.0, 2.95, 0.0)
+	warrior.add_child(head_inst)
+
+	# Right Arm & Handheld Weapon
+	var weapon_inst = MeshInstance3D.new()
+	var weapon_mesh = BoxMesh.new()
+
+	match p_type.to_upper():
+		"K": # King Royal Claymore
+			weapon_mesh.size = Vector3(0.12, 2.2, 0.35)
+			weapon_inst.position = Vector3(0.95, 1.9, 0.4)
+			weapon_inst.rotation_degrees = Vector3(15.0, 0.0, -10.0)
+		"Q": # Queen Scepter of Command
+			weapon_mesh.size = Vector3(0.1, 1.95, 0.1)
+			weapon_inst.position = Vector3(0.9, 1.85, 0.35)
+		"B": # Bishop Holy Staff / Crosier
+			weapon_mesh.size = Vector3(0.1, 2.3, 0.1)
+			weapon_inst.position = Vector3(0.85, 2.0, 0.3)
+		"N": # Knight Heavy Lance
+			weapon_mesh.size = Vector3(0.15, 2.4, 0.15)
+			weapon_inst.position = Vector3(0.95, 2.1, 0.6)
+			weapon_inst.rotation_degrees = Vector3(-35.0, 0.0, 0.0)
+		"R": # Rook Fortress War-Hammer
+			weapon_mesh.size = Vector3(0.28, 2.1, 0.65)
+			weapon_inst.position = Vector3(1.05, 1.85, 0.3)
+		_: # Pawn Gladius Broadsword
+			weapon_mesh.size = Vector3(0.1, 1.5, 0.28)
+			weapon_inst.position = Vector3(0.85, 1.75, 0.35)
+
+	weapon_inst.mesh = weapon_mesh
+	warrior.add_child(weapon_inst)
+
+	# Left Arm: Shield or Off-Hand Relic
+	var shield_inst = MeshInstance3D.new()
+	var shield_mesh = BoxMesh.new()
+	shield_mesh.size = Vector3(0.12, 1.25, 0.75)
+	shield_inst.mesh = shield_mesh
+	shield_inst.position = Vector3(-0.9, 1.85, 0.25)
+	warrior.add_child(shield_inst)
+
+	return warrior
+
+## Apply PBR materials (Noble Steel & Gold for White, Obsidian & Iron for Black)
+## Strictly emission_enabled = false on all armor/body meshes to prevent bloom blowout
+func _apply_pbr_materials(root: Node) -> void:
+	var armor_mat = StandardMaterial3D.new()
+
+	if piece_color == "white":
+		# White: Noble polished plate steel & ivory
+		armor_mat.albedo_color = Color(0.93, 0.94, 0.97, 1.0)
+		armor_mat.metallic = 0.75
+		armor_mat.roughness = 0.28
+		armor_mat.rim_enabled = true
+		armor_mat.rim = 0.35
+		armor_mat.rim_tint = 0.2
+		armor_mat.emission_enabled = false
+	else:
+		# Black: Dark obsidian iron & brushed alloy
+		armor_mat.albedo_color = Color(0.14, 0.15, 0.18, 1.0)
+		armor_mat.metallic = 0.85
+		armor_mat.roughness = 0.32
+		armor_mat.rim_enabled = true
+		armor_mat.rim = 0.45
+		armor_mat.rim_tint = 0.35
+		armor_mat.emission_enabled = false
+
+	# Apply across all MeshInstance3D nodes in the hierarchy
+	var stack: Array[Node] = [root]
+	while not stack.is_empty():
+		var n = stack.pop_back()
+		if n is MeshInstance3D:
+			n.material_override = armor_mat
+		for c in n.get_children():
+			stack.append(c)
+
+## Scale and center the model to meet target chess figurine height
+func _scale_and_center_model(model: Node3D) -> void:
+	var aabb = _compute_total_aabb(model)
+	var raw_h = maxf(0.5, aabb.size.y)
+	var target_h = get_target_height()
+	var scale_factor = target_h / raw_h
+
+	model.scale = Vector3(scale_factor, scale_factor, scale_factor)
+	# Align bottom of model to ground (Y = 0)
+	model.position.y = -aabb.position.y * scale_factor
+
+## Recursively compute combined AABB of all mesh instances
+func _compute_total_aabb(node: Node) -> AABB:
+	var combined_aabb = AABB()
+	var has_aabb = false
+
+	var stack: Array[Node] = [node]
+	while not stack.is_empty():
+		var n = stack.pop_back()
+		if n is MeshInstance3D and n.mesh != null:
+			var m_aabb = n.mesh.get_aabb()
+			if not has_aabb:
+				combined_aabb = m_aabb
+				has_aabb = true
+			else:
+				combined_aabb = combined_aabb.merge(m_aabb)
+		for c in n.get_children():
+			stack.append(c)
+
+	if not has_aabb:
+		combined_aabb = AABB(Vector3(-0.5, 0, -0.5), Vector3(1.0, get_target_height(), 1.0))
+
+	return combined_aabb
 
 func _update_materials() -> void:
-	if not is_instance_valid(mesh_instance):
-		return
-
-	var emissive_col = Color.WHITE
-	if active_theme != null:
-		emissive_col = active_theme.emissive_color
-
-	var mat = StandardMaterial3D.new()
-	if piece_color == "white":
-		# Noble burnished silver & polished ivory
-		mat.albedo_color = Color(0.95, 0.96, 1.0, 1.0)
-		mat.metallic = 0.3
-		mat.roughness = 0.25
-		mat.rim_enabled = true
-		mat.rim = 0.65
-		mat.emission_enabled = true
-		mat.emission = emissive_col * 0.35
-	else:
-		# Imposing dark obsidian & crimson/gold alloy
-		mat.albedo_color = Color(0.12, 0.13, 0.18, 1.0)
-		mat.metallic = 0.75
-		mat.roughness = 0.35
-		mat.rim_enabled = true
-		mat.rim = 0.55
-		mat.emission_enabled = true
-		mat.emission = emissive_col * 0.95
-		mat.emission_energy_multiplier = 1.5
-
-	mesh_instance.material_override = mat
+	if is_instance_valid(model_root):
+		_apply_pbr_materials(model_root)
 
 func set_selected(selected: bool) -> void:
 	is_selected = selected
@@ -275,12 +507,6 @@ func play_act3_finisher(target_pos: Vector3, _atk_type: String, _theme_id: Strin
 	var start_pos = position
 	var impact_pos = target_pos - dir * 0.3
 
-	# Power-up energy surge
-	if mesh_instance and mesh_instance.material_override is StandardMaterial3D:
-		var mat = mesh_instance.material_override as StandardMaterial3D
-		var glow_tw = create_tween()
-		glow_tw.tween_property(mat, "emission_energy_multiplier", 4.5, 0.6)
-
 	var tw = create_tween().set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_IN)
 	# Windup leap into air (0.0 - 0.75s)
 	tw.tween_property(self, "position", start_pos + Vector3(0, 2.4, 0) - dir * 0.6, 0.75)
@@ -294,10 +520,11 @@ func play_act3_finisher(target_pos: Vector3, _atk_type: String, _theme_id: Strin
 
 ## Impact reaction when hit
 func play_hit_stagger() -> void:
+	var target_node: Node3D = model_root if is_instance_valid(model_root) else self
 	var tw = create_tween()
-	tw.tween_property(mesh_instance, "rotation_degrees:z", -18.0, 0.08)
-	tw.tween_property(mesh_instance, "rotation_degrees:z", 12.0, 0.08)
-	tw.tween_property(mesh_instance, "rotation_degrees:z", 0.0, 0.1)
+	tw.tween_property(target_node, "rotation_degrees:z", -18.0, 0.08)
+	tw.tween_property(target_node, "rotation_degrees:z", 12.0, 0.08)
+	tw.tween_property(target_node, "rotation_degrees:z", 0.0, 0.1)
 
 ## Dramatic death collapse / execution reaction
 func play_death_reaction(reaction_type: String = "collapse") -> void:

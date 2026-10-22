@@ -2,12 +2,12 @@
 
 [ext_resource type="Script" path="res://scripts/themes/PieceTheme.gd" id="1_ptheme"]
 [ext_resource type="Material" uid="uid://mat_board_fantasy_001" path="res://assets/materials/mat_board_fantasy.tres" id="2_bmat"]
-[ext_resource type="CylinderMesh" uid="uid://mesh_hf_pawn_001" path="res://assets/models/high_fantasy/mesh_hf_pawn.tres" id="3_pawn"]
-[ext_resource type="PrismMesh" uid="uid://mesh_hf_knight_001" path="res://assets/models/high_fantasy/mesh_hf_knight.tres" id="4_knight"]
-[ext_resource type="CylinderMesh" uid="uid://mesh_hf_bishop_001" path="res://assets/models/high_fantasy/mesh_hf_bishop.tres" id="5_bishop"]
-[ext_resource type="BoxMesh" uid="uid://mesh_hf_rook_001" path="res://assets/models/high_fantasy/mesh_hf_rook.tres" id="6_rook"]
-[ext_resource type="CylinderMesh" uid="uid://mesh_hf_queen_001" path="res://assets/models/high_fantasy/mesh_hf_queen.tres" id="7_queen"]
-[ext_resource type="CylinderMesh" uid="uid://mesh_hf_king_001" path="res://assets/models/high_fantasy/mesh_hf_king.tres" id="8_king"]
+[ext_resource type="PackedScene" uid="uid://glb_hf_pawn_001" path="res://assets/models/high_fantasy/pawn.glb" id="3_pawn"]
+[ext_resource type="PackedScene" uid="uid://glb_hf_knight_001" path="res://assets/models/high_fantasy/knight.glb" id="4_knight"]
+[ext_resource type="PackedScene" uid="uid://glb_hf_bishop_001" path="res://assets/models/high_fantasy/bishop.glb" id="5_bishop"]
+[ext_resource type="PackedScene" uid="uid://glb_hf_rook_001" path="res://assets/models/high_fantasy/rook.glb" id="6_rook"]
+[ext_resource type="PackedScene" uid="uid://glb_hf_queen_001" path="res://assets/models/high_fantasy/queen.glb" id="7_queen"]
+[ext_resource type="PackedScene" uid="uid://glb_hf_king_001" path="res://assets/models/high_fantasy/king.glb" id="8_king"]
 [ext_resource type="Material" uid="uid://mat_piece_white_001" path="res://assets/materials/mat_piece_white.tres" id="9_wmat"]
 [ext_resource type="Material" uid="uid://mat_piece_black_001" path="res://assets/materials/mat_piece_black.tres" id="10_bmat"]
 

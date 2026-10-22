@@ -31,7 +31,7 @@ const PIECE_3D_SCENE_PATHS = {
 	"K": "res://scenes/pieces/Piece3D_King.tscn"
 }
 
-## Lookup helper to get the corresponding mesh for standard chess notation
+## Lookup helper to get the corresponding mesh or PackedScene model for standard chess notation
 func get_piece_mesh(piece_type: String) -> Resource:
 	match piece_type.to_upper():
 		"P": return pawn_mesh
@@ -41,6 +41,10 @@ func get_piece_mesh(piece_type: String) -> Resource:
 		"Q": return queen_mesh
 		"K": return king_mesh
 		_: return null
+
+## Alias for get_piece_mesh
+func get_piece_model(piece_type: String) -> Resource:
+	return get_piece_mesh(piece_type)
 
 ## Returns a dictionary of all piece meshes for quick iteration
 func get_all_meshes() -> Dictionary:

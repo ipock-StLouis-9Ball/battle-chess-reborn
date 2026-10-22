@@ -3,7 +3,7 @@
 [ext_resource type="Script" path="res://scenes/camera/CinematicCamera.gd" id="1_cam"]
 
 [node name="CinematicCamera" type="Camera3D"]
-transform = Transform3D(1, 0, 0, 0, 0.771625, 0.636078, 0, -0.636078, 0.771625, 0, 16, 20)
-fov = 35.0
+transform = Transform3D(1, 0, 0, 0, 0.782608, 0.622515, 0, -0.622515, 0.782608, 0, 24.5, 29.5)
+fov = 38.0
 current = true
 script = ExtResource("1_cam")

@@ -3,19 +3,19 @@ extends Camera3D
 
 ## Heroic 3D Isometric & Action Duel Camera
 ## - Recreates the iconic 1988 perspective with stationary isometric overview:
-##   * Position: Vector3(0.0, 16.0, 20.0)
-##   * Pitch: Vector3(-39.5, 0.0, 0.0) (classic ~40° elevation angle looking down at board center)
-##   * FOV: 35.0 (eliminates wide-angle distortion)
+##   * Position: Vector3(0.0, 24.5, 29.5)
+##   * Pitch: Vector3(-38.5, 0.0, 0.0) (~38.5° elevation angle looking down at board center)
+##   * FOV: 38.0 (frames the entire 25.4m dais, plinths, and braziers without distortion)
 ##   * White at bottom of screen, Black at top of screen
 ## - Targeted square zoom on capture execution:
-##   * Smoothly tweens in 0.4s to Vector3(sq_x, 3.2, sq_z + 4.8) looking at Vector3(sq_x, 1.2, sq_z)
+##   * Smoothly tweens in 0.4s to Vector3(sq_x, 4.2, sq_z + 6.2) looking at Vector3(sq_x, 1.4, sq_z)
 ##   * Smoothly returns to stationary overview in 0.5s at duel conclusion
 
-@export var base_elevation_angle: float = 39.5 # Classic ~40° elevation pitch
-@export var base_fov: float = 35.0
+@export var base_elevation_angle: float = 38.5 # Classic ~38.5° elevation pitch
+@export var base_fov: float = 38.0
 
-var base_pos: Vector3 = Vector3(0.0, 16.0, 20.0)
-var base_rot: Vector3 = Vector3(-39.5, 0.0, 0.0)
+var base_pos: Vector3 = Vector3(0.0, 24.5, 29.5)
+var base_rot: Vector3 = Vector3(-38.5, 0.0, 0.0)
 
 var is_in_duel: bool = false
 var active_tween: Tween
@@ -52,12 +52,12 @@ func _update_adaptive_fov() -> void:
 		return
 	var aspect = vp_size.x / vp_size.y
 	# Standard landscape is 16:9 (~1.778). On tablets (4:3 = 1.33, 16:10 = 1.6) or foldables (~1.0),
-	# adapt FOV so the 20m board and plinth staging are framed perfectly without horizontal cropping.
+	# adapt FOV so the full board and plinth staging are framed perfectly without horizontal cropping.
 	if aspect < 1.7:
 		var factor = 1.7778 / aspect
-		base_fov = clampf(35.0 * factor, 35.0, 50.0)
+		base_fov = clampf(38.0 * factor, 38.0, 52.0)
 	else:
-		base_fov = 35.0
+		base_fov = 38.0
 
 ## Calculate and restore stationary heroic overview framing
 func reset_to_heroic_overview(duration: float = 0.5) -> void:
@@ -76,14 +76,14 @@ func zoom_to_square(sq_x: float, sq_z: float, duration: float = 0.4) -> void:
 	if active_tween and active_tween.is_valid():
 		active_tween.kill()
 
-	# Looking directly at Vector3(sq_x, 1.2, sq_z) from Vector3(sq_x, 3.2, sq_z + 4.8)
-	var focus_pos = Vector3(sq_x, 3.2, sq_z + 4.8)
-	var focus_rot = Vector3(-22.62, 0.0, 0.0)
+	# Looking directly at Vector3(sq_x, 1.4, sq_z) from Vector3(sq_x, 4.2, sq_z + 6.2)
+	var focus_pos = Vector3(sq_x, 4.2, sq_z + 6.2)
+	var focus_rot = Vector3(-24.3, 0.0, 0.0)
 
 	active_tween = create_tween().set_parallel(true).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
 	active_tween.tween_property(self, "position", focus_pos, duration)
 	active_tween.tween_property(self, "rotation_degrees", focus_rot, duration)
-	active_tween.tween_property(self, "fov", 33.0, duration)
+	active_tween.tween_property(self, "fov", 35.0, duration)
 
 ## Dynamic plunge into 3D duel clash (alias for backward compatibility)
 func zoom_to_duel_focus(world_target: Vector3, duration: float = 0.4) -> void:

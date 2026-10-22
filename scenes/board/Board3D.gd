@@ -189,13 +189,13 @@ func _build_corner_braziers() -> void:
 		bowl_inst.position = Vector3(0.0, 1.35, 0.0)
 		brazier_node.add_child(bowl_inst)
 
-		# Emissive Flame / Plasma Orb
+		# Emissive Flame / Plasma Orb (balanced soft glow)
 		var flame_mat = StandardMaterial3D.new()
 		flame_mat.shading_mode = StandardMaterial3D.SHADING_MODE_UNSHADED
 		flame_mat.albedo_color = Color(1.0, 0.7, 0.2)
 		flame_mat.emission_enabled = true
 		flame_mat.emission = Color(1.0, 0.7, 0.2)
-		flame_mat.emission_energy_multiplier = 3.0
+		flame_mat.emission_energy_multiplier = 0.6
 
 		var flame_inst = MeshInstance3D.new()
 		flame_inst.mesh = orb_mesh
@@ -207,7 +207,7 @@ func _build_corner_braziers() -> void:
 		# Atmospheric Corner Omni Light
 		var olight = OmniLight3D.new()
 		olight.light_color = Color(1.0, 0.72, 0.25)
-		olight.light_energy = 1.3
+		olight.light_energy = 0.6
 		olight.omni_range = 14.0
 		olight.position = Vector3(0.0, 1.85, 0.0)
 		brazier_node.add_child(olight)
@@ -470,7 +470,7 @@ func _spawn_tile_highlight(pos: Vector2i, color: Color, is_combat_target: bool, 
 	mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
 	mat.emission_enabled = true
 	mat.emission = color
-	mat.emission_energy_multiplier = 2.4 if (is_combat_target or is_origin) else 1.8
+	mat.emission_energy_multiplier = 0.45 if (is_combat_target or is_origin) else 0.3
 	quad.material_override = mat
 
 	quad.position = board_to_world(pos) + Vector3(0, 0.17, 0)
