@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Duel Chess: Battle Remake - Visual Asset Generator
+Duel of Kings: Animated Chess - Visual Asset Generator
 Generates:
 1. 18 HUD Piece Portraits (512x512 PNG)
 2. 3 Seamless PBR Board Textures (1024x1024 PNG)
@@ -346,7 +346,7 @@ def generate_store_assets():
 # ---------------------------------------------------------------------------
 
 def main():
-    print("=== Duel Chess: Nano Banana 2D Visual Synthesis Pipeline ===")
+    print("=== Duel of Kings: Nano Banana 2D Visual Synthesis Pipeline ===")
     
     # 1. Generate PBR Board Textures
     generate_fantasy_marble(os.path.join(BOARD_DIR, "board_fantasy_marble.png"))

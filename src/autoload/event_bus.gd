@@ -1,6 +1,6 @@
 extends Node
 
-## Central Event Bus for Duel Chess: Battle Remake
+## Central Event Bus for Duel of Kings: Animated Chess
 ## Provides decoupled pub/sub signal architecture across game systems.
 
 # --- Game Flow & State Signals ---

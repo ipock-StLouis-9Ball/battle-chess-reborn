@@ -1,7 +1,7 @@
 class_name Main
 extends Node
 
-## Root Scene Controller for Duel Chess: Battle Remake
+## Root Scene Controller for Duel of Kings: Animated Chess
 ## Manages high-level screen transitions and view switching
 
 @onready var splash_screen: SplashScreen = $Screens/SplashScreen

@@ -1,7 +1,7 @@
 class_name MathHelpers
 extends RefCounted
 
-## Coordinate and math helpers for Duel Chess 8x8 grid & duel arena
+## Coordinate and math helpers for Duel of Kings 8x8 grid & duel arena
 
 static func grid_to_algebraic(pos: Vector2i) -> String:
 	if not is_valid_grid_pos(pos):

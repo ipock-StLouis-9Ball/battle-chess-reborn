@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Duel Chess: Reborn - 3D Asset & Skeleton Pipeline Generator
+Duel of Kings: Animated Chess - 3D Asset & Skeleton Pipeline Generator
 Generates CC0-compliant, valid binary .glb 3D meshes for all chess pieces across 3 themes:
   - Fantasy: Paladin, Goblin, Sorcerer, Dragon Rook, Queen, King
   - Cyberpunk: Android Pawn, Neon Katana Knight, Railgun Bishop, Cyber Mech Rook, Holo Queen, Cyber King

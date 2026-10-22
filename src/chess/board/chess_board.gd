@@ -255,7 +255,7 @@ func _on_duel_completed(winner_side: int, winner_data: Resource, loser_data: Res
 func _check_post_move_conditions() -> void:
 	var next_color = GameEnums.PieceColor.BLACK if GameManager.active_turn_color == GameEnums.PieceColor.WHITE else GameEnums.PieceColor.WHITE
 	
-	# Verify King existence (in duel chess, a king might be defeated in duel!)
+	# Verify King existence (in Duel of Kings, a king might be defeated in duel!)
 	var white_king = engine.find_king(GameEnums.PieceColor.WHITE)
 	var black_king = engine.find_king(GameEnums.PieceColor.BLACK)
 

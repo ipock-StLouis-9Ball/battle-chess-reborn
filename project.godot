@@ -6,8 +6,8 @@ config_version=5
 
 [application]
 
-config/name="Duel Chess: Reborn"
-config/description="Heroic 3D tactical combat chess with strategic turns and cinematic duel battles across High Fantasy, Cyberpunk, and Eldritch realms."
+config/name="Duel of Kings: Animated Chess"
+config/description="Strategic chess reimagined with theatrical 3D isometric combat duels across High Fantasy, Cyberpunk, and Eldritch factions."
 config/version="1.0.0"
 run/main_scene="res://scenes/ui/Main.tscn"
 config/features=PackedStringArray("4.3", "Mobile")

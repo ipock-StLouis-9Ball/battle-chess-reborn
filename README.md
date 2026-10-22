@@ -1,6 +1,6 @@
-# Duel Chess: Reborn ⚔️♟️
+# Duel of Kings: Animated Chess ⚔️♟️
 
-A modernized tactical combat chess game where strategic chess moves escalate into real-time gladiator arena duels.
+An original spiritual successor to classic theatrical chess, reimagining strategic turn-based board mastery with dramatic 3D isometric combat duels across High Fantasy, Cyberpunk, and Eldritch factions.
 
 Built for **Godot Engine 4 (v4.3+)**, architected specifically for cross-platform delivery across:
 - 🖥️ **Steam PC (Windows / Linux / Steam Deck)**
@@ -162,4 +162,4 @@ battle-chess-reborn/
 ---
 
 ## 🛡️ License & Credits
-Developed for Duel Chess: Battle Remake. Built with Godot Engine 4.
+Developed for Duel of Kings: Animated Chess. Built with Godot Engine 4.

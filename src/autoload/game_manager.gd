@@ -1,7 +1,7 @@
 extends Node
 
 ## Game Manager
-## Global state orchestrator for Duel Chess: Battle Remake
+## Global state orchestrator for Duel of Kings: Animated Chess
 
 var current_state: GameEnums.GameState = GameEnums.GameState.BOOT
 var previous_state: GameEnums.GameState = GameEnums.GameState.BOOT

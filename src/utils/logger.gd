@@ -1,7 +1,7 @@
 class_name Logger
 extends RefCounted
 
-## Structured logging utility for Duel Chess
+## Structured logging utility for Duel of Kings: Animated Chess
 
 enum Level {
 	DEBUG,

@@ -1,7 +1,7 @@
 class_name GameEnums
 extends RefCounted
 
-## Global Enums for Duel Chess: Battle Remake
+## Global Enums for Duel of Kings: Animated Chess
 
 enum PieceType {
 	NONE = 0,

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # ==============================================================================
-# Duel Chess: Reborn - 3D Asset & Skeleton Pipeline Fetcher & Generator
+# Duel of Kings: Animated Chess - 3D Asset & Skeleton Pipeline Fetcher & Generator
 # Theme Coverage: Fantasy, Cyberpunk, Eldritch
 # CC0 / Open Source Character & Creature Models
 # ==============================================================================
@@ -16,7 +16,7 @@ CYBERPUNK_DIR="${MODELS_DIR}/cyberpunk"
 ELDRITCH_DIR="${MODELS_DIR}/eldritch"
 
 echo "============================================================"
-echo " Duel Chess: Reborn - 3D Asset & Skeleton Pipeline"
+echo " Duel of Kings: Animated Chess - 3D Asset & Skeleton Pipeline"
 echo " Target Directory: ${MODELS_DIR}"
 echo "============================================================"
 
