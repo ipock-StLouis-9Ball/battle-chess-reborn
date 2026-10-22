@@ -1,33 +1,66 @@
-[gd_scene load_steps=4 format=3 uid="uid://board3d_sc_001"]
+[gd_scene load_steps=8 format=3 uid="uid://board3d_sc_001"]
 
 [ext_resource type="Script" path="res://scenes/board/Board3D.gd" id="1_b3d"]
 [ext_resource type="Material" uid="uid://mat_board_fantasy_001" path="res://assets/materials/mat_board_fantasy.tres" id="2_bmat"]
 
-[sub_resource type="BoxMesh" id="BoxMesh_board"]
-size = Vector3(8.5, 0.3, 8.5)
+[sub_resource type="BoxMesh" id="BoxMesh_pedestal"]
+size = Vector3(22, 1.4, 22)
+
+[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_env"]
+sky_top_color = Color(0.12, 0.16, 0.24, 1)
+sky_horizon_color = Color(0.25, 0.3, 0.4, 1)
+ground_bottom_color = Color(0.08, 0.09, 0.12, 1)
+ground_horizon_color = Color(0.18, 0.2, 0.26, 1)
+
+[sub_resource type="Sky" id="Sky_env"]
+sky_material = SubResource("ProceduralSkyMaterial_env")
+
+[sub_resource type="Environment" id="Environment_heroic"]
+background_mode = 2
+sky = SubResource("Sky_env")
+ambient_light_source = 3
+ambient_light_color = Color(0.8, 0.85, 0.95, 1)
+ambient_light_energy = 0.6
+tonemap_mode = 2
+tonemap_exposure = 1.15
+glow_enabled = true
+glow_intensity = 0.45
+glow_bloom = 0.2
 
 [node name="Board3D" type="Node3D"]
 script = ExtResource("1_b3d")
+square_size = 2.4
+board_height = 1.2
 
-[node name="BoardMesh" type="MeshInstance3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.15, 0)
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_heroic")
+
+[node name="PedestalMesh" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.7, 0)
 material_override = ExtResource("2_bmat")
-mesh = SubResource("BoxMesh_board")
+mesh = SubResource("BoxMesh_pedestal")
+
+[node name="TilesRoot" type="Node3D" parent="."]
 
 [node name="PiecesRoot" type="Node3D" parent="."]
 
-[node name="Camera3D" type="Camera3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 0.707107, 0.707107, 0, -0.707107, 0.707107, 0, 7.5, 6.5)
+[node name="HighlightsRoot" type="Node3D" parent="."]
+
+[node name="CameraRig" type="Node3D" parent="."]
+
+[node name="Camera3D" type="Camera3D" parent="CameraRig"]
+transform = Transform3D(1, 0, 0, 0, 0.743145, 0.669131, 0, -0.669131, 0.743145, 0, 19, 21)
 current = true
-fov = 55.0
+fov = 48.0
 
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
-transform = Transform3D(0.866025, -0.353553, 0.353553, 0, 0.707107, 0.707107, -0.5, -0.612372, 0.612372, 5, 10, 5)
-light_energy = 1.2
+transform = Transform3D(0.866025, -0.353553, 0.353553, 0, 0.707107, 0.707107, -0.5, -0.612372, 0.612372, 10, 22, 10)
+light_color = Color(1, 0.96, 0.88, 1)
+light_energy = 1.4
 shadow_enabled = true
 
 [node name="FillLight" type="OmniLight3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3, 0)
-light_color = Color(0.9, 0.95, 1, 1)
-light_energy = 0.5
-omni_range = 12.0
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 8, 0)
+light_color = Color(0.7, 0.85, 1, 1)
+light_energy = 0.8
+omni_range = 30.0

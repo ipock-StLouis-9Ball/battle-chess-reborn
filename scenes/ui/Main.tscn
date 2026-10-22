@@ -1,10 +1,9 @@
-[gd_scene load_steps=6 format=3 uid="uid://main_sc_001"]
+[gd_scene load_steps=5 format=3 uid="uid://main_sc_001"]
 
 [ext_resource type="Script" path="res://scenes/ui/Main.gd" id="1_mview"]
-[ext_resource type="PackedScene" path="res://scenes/board/Board.tscn" id="2_board"]
+[ext_resource type="Script" path="res://scripts/chess/ChessBoard.gd" id="2_cboard"]
 [ext_resource type="PackedScene" path="res://scenes/duel_arena/DuelArena.tscn" id="3_arena"]
-[ext_resource type="PackedScene" path="res://scenes/camera/CinematicCamera.tscn" id="4_cam"]
-[ext_resource type="PackedScene" path="res://scenes/board/Board3D.tscn" id="5_b3d"]
+[ext_resource type="PackedScene" path="res://scenes/board/Board3D.tscn" id="4_b3d"]
 
 [node name="Main" type="Control"]
 layout_mode = 3
@@ -15,17 +14,10 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_mview")
 
-[node name="Background" type="ColorRect" parent="."]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-color = Color(0.06, 0.07, 0.09, 1)
+[node name="ChessLogic" type="Node" parent="."]
+script = ExtResource("2_cboard")
 
-[node name="Board3DContainer" type="SubViewportContainer" parent="."]
-visible = false
+[node name="SubViewportContainer" type="SubViewportContainer" parent="."]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -34,18 +26,13 @@ grow_horizontal = 2
 grow_vertical = 2
 stretch = true
 
-[node name="SubViewport" type="SubViewport" parent="Board3DContainer"]
+[node name="SubViewport" type="SubViewport" parent="SubViewportContainer"]
 handle_input_locally = false
 size = Vector2i(1920, 1080)
 size_2d_override_stretch = true
 render_target_update_mode = 4
 
-[node name="Board3D" parent="Board3DContainer/SubViewport" instance=ExtResource("5_b3d")]
-
-[node name="CinematicCamera" parent="Board3DContainer/SubViewport" instance=ExtResource("4_cam")]
-
-[node name="Board2D" parent="." instance=ExtResource("2_board")]
-layout_mode = 1
+[node name="Board3D" parent="SubViewportContainer/SubViewport" instance=ExtResource("4_b3d")]
 
 [node name="DuelArena" parent="." instance=ExtResource("3_arena")]
 layout_mode = 1
@@ -84,11 +71,6 @@ layout_mode = 2
 size_flags_horizontal = 10
 theme_override_font_sizes/font_size = 22
 text = "🎖️ Platinum II (1450 Elo)"
-
-[node name="BtnViewToggle" type="Button" parent="HUD/TopBar"]
-custom_minimum_size = Vector2(180, 0)
-layout_mode = 2
-text = "🎥 View: 2D Tactical"
 
 [node name="BottomBar" type="HBoxContainer" parent="HUD"]
 anchors_preset = 12

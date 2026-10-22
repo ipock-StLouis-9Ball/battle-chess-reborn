@@ -1,56 +1,49 @@
 class_name MainView
 extends Control
 
-## Top-Level Master Scene
-## Assembles 2D Board, 3D Board, DuelArena, CinematicCamera, and HUD with theme switching and Elo ranking
+## Heroic 3D Isometric Battle Chess - Master Scene Controller
+## Pure 3D tactical battlefield orchestrating 3D pieces, dynamic theme materials,
+## cinematic duel executions, ranked Elo progression, and cross-platform HUD.
 
-@onready var board_2d: BoardView = $Board2D
-@onready var board_3d_container: SubViewportContainer = $Board3DContainer
-@onready var board_3d: Board3D = $Board3DContainer/SubViewport/Board3D
+@onready var chess_logic: ChessBoard = $ChessLogic
+@onready var board_3d: Board3D = $SubViewportContainer/SubViewport/Board3D
 @onready var duel_arena_view: DuelArenaView = $DuelArena
-@onready var camera: CinematicCamera = $Board3DContainer/SubViewport/CinematicCamera
-@onready var camera_2d: CinematicCamera = camera
 
 # HUD elements
 @onready var turn_label: Label = $HUD/TopBar/TurnLabel
 @onready var white_clock_label: Label = $HUD/TopBar/WhiteClock
 @onready var black_clock_label: Label = $HUD/TopBar/BlackClock
 @onready var elo_badge: Label = $HUD/TopBar/EloBadge
-@onready var btn_view_toggle: Button = $HUD/TopBar/BtnViewToggle
 
 @onready var platform_label: Label = $HUD/BottomBar/PlatformLabel
 @onready var btn_theme_hf: Button = $HUD/BottomBar/ThemeHF
 @onready var btn_theme_cp: Button = $HUD/BottomBar/ThemeCP
 @onready var btn_theme_el: Button = $HUD/BottomBar/ThemeEL
 
-var is_3d_mode: bool = false
 var white_time: float = 600.0 # 10 minute blitz
 var black_time: float = 600.0
 var is_clock_running: bool = true
 var player_elo: int = 1450 # Player Elo rating
 
 func _ready() -> void:
-	_setup_3d_board()
+	_init_heroic_3d_battlefield()
 	_update_platform_info()
 	_update_elo_display()
 	_connect_events()
-	_set_view_mode(false)
 
-func _setup_3d_board() -> void:
-	if is_instance_valid(board_3d) and is_instance_valid(board_2d):
-		board_3d.bind_chess_board(board_2d.chess_board)
+func _init_heroic_3d_battlefield() -> void:
+	if is_instance_valid(board_3d) and is_instance_valid(chess_logic):
+		board_3d.bind_chess_board(chess_logic)
 
 func _connect_events() -> void:
-	var chess_board = board_2d.chess_board
-	chess_board.turn_changed.connect(_on_turn_changed)
-	chess_board.game_over.connect(_on_game_over)
-	chess_board.check_declared.connect(_on_check_declared)
+	chess_logic.turn_changed.connect(_on_turn_changed)
+	chess_logic.game_over.connect(_on_game_over)
+	chess_logic.check_declared.connect(_on_check_declared)
 
 	if has_node("/root/DuelDirector"):
 		var dd = get_node("/root/DuelDirector")
 		dd.chess_clock_paused.connect(func(paused): is_clock_running = not paused)
 
-	btn_view_toggle.pressed.connect(_on_view_toggle_pressed)
 	btn_theme_hf.pressed.connect(func(): _switch_theme("high_fantasy"))
 	btn_theme_cp.pressed.connect(func(): _switch_theme("cyberpunk"))
 	btn_theme_el.pressed.connect(func(): _switch_theme("eldritch"))
@@ -61,22 +54,11 @@ func _switch_theme(theme_name: String) -> void:
 	if has_node("/root/AudioManager"):
 		get_node("/root/AudioManager").play_sfx("click", "UI")
 
-func _on_view_toggle_pressed() -> void:
-	_set_view_mode(not is_3d_mode)
-	if has_node("/root/AudioManager"):
-		get_node("/root/AudioManager").play_sfx("click", "UI")
-
-func _set_view_mode(enable_3d: bool) -> void:
-	is_3d_mode = enable_3d
-	board_2d.visible = not enable_3d
-	board_3d_container.visible = enable_3d
-	btn_view_toggle.text = "🎥 View: 3D Isometric" if is_3d_mode else "🎥 View: 2D Tactical"
-
 func _process(delta: float) -> void:
 	if not is_clock_running:
 		return
 
-	var active_color = board_2d.chess_board.get_active_color()
+	var active_color = chess_logic.get_active_color()
 	if active_color == "white":
 		white_time = maxf(0.0, white_time - delta)
 	else:
@@ -90,13 +72,13 @@ func _update_clock_display() -> void:
 
 func _on_turn_changed(turn_color: String, turn_num: int) -> void:
 	turn_label.text = "%s's Turn (Turn %d)" % [turn_color.to_upper(), turn_num]
-	turn_label.add_theme_color_override("font_color", Color(1, 1, 1) if turn_color == "white" else Color(1, 0.4, 0.4))
+	turn_label.add_theme_color_override("font_color", Color(1, 1, 1) if turn_color == "white" else Color(1, 0.45, 0.45))
 	if has_node("/root/AudioManager"):
 		get_node("/root/AudioManager").play_sfx("move", "SFX")
 
 func _on_check_declared(king_color: String) -> void:
 	turn_label.text = "⚠️ %s KING IN CHECK!" % king_color.to_upper()
-	turn_label.add_theme_color_override("font_color", Color(1, 0.2, 0.2))
+	turn_label.add_theme_color_override("font_color", Color(1, 0.25, 0.25))
 	if has_node("/root/AudioManager"):
 		get_node("/root/AudioManager").play_sfx("check", "SFX")
 
