@@ -1,7 +1,7 @@
 class_name MainView
 extends Control
 
-## Heroic 3D Isometric Battle Chess - Master Scene Controller
+## Heroic 3D Isometric Combat Chess - Master Scene Controller
 ## Pure 3D tactical battlefield orchestrating 3D pieces, dynamic theme materials,
 ## cinematic duel executions, ranked Elo progression, and cross-platform HUD.
 

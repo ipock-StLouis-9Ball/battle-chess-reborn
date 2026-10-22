@@ -1,7 +1,7 @@
 class_name Piece3D
 extends Node3D
 
-## Heroic 3D Chess Piece (1988 Battle Chess Style)
+## Heroic 3D Combat Chess Piece
 ## - Scaled gladiator character standing ~1.8x to 2.2x tile width (4.5m - 5.5m tall)
 ## - 3D raycast touch picking colliders and emissive glowing selection ring
 ## - Bone attachment sockets (Hand_R_Socket, Head_Socket)

@@ -22,7 +22,7 @@ signal check_alert(king_color: GameEnums.PieceColor)
 signal checkmate_alert(winner_color: GameEnums.PieceColor)
 signal stalemate_alert()
 
-# --- Duel Arena Signals (Battle Chess Remake Core) ---
+# --- Duel Arena Signals (Combat Chess Core) ---
 signal duel_triggered(attacker: Resource, defender: Resource, battle_pos: Vector2i)
 signal duel_countdown_started(duration: float)
 signal duel_health_changed(fighter_side: int, current_hp: float, max_hp: float) # 0=attacker, 1=defender

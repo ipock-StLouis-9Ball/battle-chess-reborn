@@ -276,7 +276,7 @@ func pick_ai_move(color: GameEnums.PieceColor, difficulty: GameEnums.AIDifficult
 		var score = 0.0
 		if m.is_attack and m.captured_piece != null:
 			score += _get_piece_value(m.captured_piece.type) * 10.0
-			# Aggression bonus in Battle Chess
+			# Aggression bonus in Combat Chess
 			score += 15.0
 		# Center control bonus
 		var center_dist = abs(m.to_pos.x - 3.5) + abs(m.to_pos.y - 3.5)

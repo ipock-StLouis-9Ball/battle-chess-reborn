@@ -6,8 +6,8 @@ config_version=5
 
 [application]
 
-config/name="Duel Chess: Battle Remake"
-config/description="Classic Battle Chess reimagined with strategic moves and cinematic duel combat across High Fantasy, Cyberpunk, and Eldritch themes."
+config/name="Duel Chess: Reborn"
+config/description="Heroic 3D tactical combat chess with strategic turns and cinematic duel battles across High Fantasy, Cyberpunk, and Eldritch realms."
 config/version="1.0.0"
 run/main_scene="res://scenes/ui/Main.tscn"
 config/features=PackedStringArray("4.3", "Mobile")

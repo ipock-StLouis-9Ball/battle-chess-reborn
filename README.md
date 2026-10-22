@@ -1,6 +1,6 @@
-# Duel Chess: Battle Remake ⚔️♟️
+# Duel Chess: Reborn ⚔️♟️
 
-A modernized reimagination of classic Battle Chess where strategic chess moves escalate into real-time gladiator arena duels.
+A modernized tactical combat chess game where strategic chess moves escalate into real-time gladiator arena duels.
 
 Built for **Godot Engine 4 (v4.3+)**, architected specifically for cross-platform delivery across:
 - 🖥️ **Steam PC (Windows / Linux / Steam Deck)**
@@ -15,7 +15,7 @@ Built for **Godot Engine 4 (v4.3+)**, architected specifically for cross-platfor
    - Intelligent AI opponent with adjustable difficulty (Apprentice to Grandmaster).
    - Local Pass & Play for 2 players on desktop or mobile touchscreens.
 
-2. **Action Arena Duels (The "Battle Chess" Remake)**:
+2. **Action Arena Duels (Gladiator Combat Duels)**:
    - When an attacking piece moves onto an occupied enemy square, a **Real-Time Combat Duel** triggers!
    - Each chess piece class features unique combat stats, attack speed, armor, and signature abilities:
      - **Pawn**: *Underdog Rush* (Fast jabs, high crit rate against heavy pieces).
@@ -98,7 +98,7 @@ battle-chess-reborn/
     │   └── pieces/
     │       └── piece_view.tscn/.gd  # Visual piece with animations & HP bar
     │
-    ├── combat/                   # Battle Chess Real-Time Duel Arena
+    ├── combat/                   # Tactical Real-Time Duel Arena
     │   ├── arena/
     │   │   ├── duel_arena.tscn/.gd  # Arena ring, round timer, resolution
     │   │   └── duel_camera.gd       # Dynamic 2D camera framing both fighters + screenshake

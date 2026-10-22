@@ -144,7 +144,7 @@ func _execute_move(move: ChessMove) -> void:
 		return
 
 	if move.is_attack:
-		# Attack initiated -> Start Battle Chess Duel!
+		# Attack initiated -> Start Combat Chess Duel!
 		var defender_piece = engine.get_piece_at(move.to_pos)
 		Logger.info("ChessBoard", "Duel engaged! %s (%s) attacks %s (%s) at %s" % [
 			MathHelpers.piece_type_to_name(attacker_piece.type),

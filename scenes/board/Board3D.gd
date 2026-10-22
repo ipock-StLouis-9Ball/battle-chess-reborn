@@ -1,8 +1,10 @@
 class_name Board3D
 extends Node3D
 
-## Heroic 3D Isometric Chess Board Coordinator (1988 Battle Chess Style)
-## - Generous tile dimensions (tile_size = 2.5m, filling ~85% mobile landscape)
+## Heroic 3D Isometric Combat Chess Coordinator
+## - Multi-tiered architectural dais staging with chiseled basalt plinth and beveled border frame
+## - Engraved algebraic notation labels (A-H, 1-8) along all four perimeter rims
+## - Four corner guardian braziers with dynamic atmospheric lighting
 ## - Physical 3D raycast picking on all 64 tiles and standing pieces
 ## - Emissive glowing selection rings and emerald/gold legal move markers
 ## - Parabolic leap movements, cinematic duel plunges, and dynamic theme switching
@@ -11,20 +13,32 @@ signal square_clicked(pos: Vector2i)
 
 const BOARD_SIZE: int = 8
 @export var tile_size: float = 2.5
-@export var square_size: float = 2.5 # Alias for backwards compatibility
+@export var square_size: float = 2.5 # Backwards compatibility alias
 @export var board_height: float = 1.4
 
+@onready var world_env: WorldEnvironment = $WorldEnvironment
+@onready var base_plinth: MeshInstance3D = $BasePlinth
 @onready var pedestal_mesh: MeshInstance3D = $PedestalMesh
+@onready var border_frame: MeshInstance3D = $BorderFrame
+@onready var notation_root: Node3D = $NotationRoot
+@onready var braziers_root: Node3D = $BraziersRoot
 @onready var tiles_root: Node3D = $TilesRoot
 @onready var pieces_root: Node3D = $PiecesRoot
 @onready var highlights_root: Node3D = $HighlightsRoot
 @onready var camera_rig: Node3D = $CameraRig
 @onready var camera_3d: Camera3D = $CameraRig/CinematicCamera
+@onready var key_light: DirectionalLight3D = $DirectionalLight3D
+@onready var rim_light: DirectionalLight3D = $RimLight3D
+@onready var fill_light: OmniLight3D = $FillLight
 
 var chess_board: ChessBoard
 var active_pieces: Dictionary = {} # Vector2i -> Piece3D
 var tile_areas: Dictionary = {} # Vector2i -> Area3D
 var active_highlights: Dictionary = {} # Vector2i -> MeshInstance3D
+
+var notation_labels: Array[Label3D] = []
+var brazier_lights: Array[OmniLight3D] = []
+var brazier_flames: Array[MeshInstance3D] = []
 
 var is_animating_move: bool = false
 
@@ -33,6 +47,7 @@ func _ready() -> void:
 		tile_size = square_size
 	square_size = tile_size
 
+	_build_board_staging()
 	_build_3d_tiles()
 	if has_node("/root/ThemeManager"):
 		get_node("/root/ThemeManager").piece_theme_changed.connect(apply_theme)
@@ -47,6 +62,156 @@ func bind_chess_board(board_logic: ChessBoard) -> void:
 	chess_board.theme_swapped.connect(func(_id, theme_res): apply_theme(theme_res))
 	chess_board.duel_triggered.connect(_on_duel_triggered)
 	_sync_3d_pieces()
+
+## Build heroic architectural board staging (coordinates, corner braziers)
+func _build_board_staging() -> void:
+	_build_notation_labels()
+	_build_corner_braziers()
+
+## Engrave 3D algebraic coordinate notation (A-H, 1-8) along all 4 perimeter borders
+func _build_notation_labels() -> void:
+	for child in notation_root.get_children():
+		child.queue_free()
+	notation_labels.clear()
+
+	var file_names = ["A", "B", "C", "D", "E", "F", "G", "H"]
+	var rank_names = ["8", "7", "6", "5", "4", "3", "2", "1"]
+
+	var rim_dist = 10.45
+	var label_y = 0.12
+
+	# 1. Front and Back Rims (Files A through H)
+	for i in range(BOARD_SIZE):
+		var x_pos = (float(i) - 3.5) * tile_size
+		var text = file_names[i]
+
+		# Front Rim (facing camera)
+		var front_label = _create_notation_label(text)
+		front_label.position = Vector3(x_pos, label_y, rim_dist)
+		front_label.rotation_degrees = Vector3(-45.0, 0.0, 0.0)
+		notation_root.add_child(front_label)
+		notation_labels.append(front_label)
+
+		# Back Rim (opposite side)
+		var back_label = _create_notation_label(text)
+		back_label.position = Vector3(x_pos, label_y, -rim_dist)
+		back_label.rotation_degrees = Vector3(-45.0, 180.0, 0.0)
+		notation_root.add_child(back_label)
+		notation_labels.append(back_label)
+
+	# 2. Left and Right Rims (Ranks 8 through 1)
+	for j in range(BOARD_SIZE):
+		var z_pos = (float(j) - 3.5) * tile_size
+		var text = rank_names[j]
+
+		# Left Rim
+		var left_label = _create_notation_label(text)
+		left_label.position = Vector3(-rim_dist, label_y, z_pos)
+		left_label.rotation_degrees = Vector3(-45.0, 90.0, 0.0)
+		notation_root.add_child(left_label)
+		notation_labels.append(left_label)
+
+		# Right Rim
+		var right_label = _create_notation_label(text)
+		right_label.position = Vector3(rim_dist, label_y, z_pos)
+		right_label.rotation_degrees = Vector3(-45.0, -90.0, 0.0)
+		notation_root.add_child(right_label)
+		notation_labels.append(right_label)
+
+func _create_notation_label(text: String) -> Label3D:
+	var l = Label3D.new()
+	l.text = text
+	l.font_size = 54
+	l.pixel_size = 0.016
+	l.modulate = Color(1.0, 0.85, 0.35, 0.95)
+	l.outline_modulate = Color(0.04, 0.05, 0.08, 0.95)
+	l.outline_size = 10
+	l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	l.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	return l
+
+## Construct 4 Heroic Corner Braziers / Beacon Obelisks
+func _build_corner_braziers() -> void:
+	for child in braziers_root.get_children():
+		child.queue_free()
+	brazier_lights.clear()
+	brazier_flames.clear()
+
+	var corner_coords = [
+		Vector3(-11.5, 0.0, -11.5),
+		Vector3(11.5, 0.0, -11.5),
+		Vector3(-11.5, 0.0, 11.5),
+		Vector3(11.5, 0.0, 11.5)
+	]
+
+	var col_mesh = CylinderMesh.new()
+	col_mesh.top_radius = 0.55
+	col_mesh.bottom_radius = 0.75
+	col_mesh.height = 1.6
+	col_mesh.radial_segments = 8
+
+	var bowl_mesh = CylinderMesh.new()
+	bowl_mesh.top_radius = 0.85
+	bowl_mesh.bottom_radius = 0.45
+	bowl_mesh.height = 0.35
+	bowl_mesh.radial_segments = 12
+
+	var orb_mesh = SphereMesh.new()
+	orb_mesh.radius = 0.35
+	orb_mesh.height = 0.7
+	orb_mesh.radial_segments = 16
+	orb_mesh.rings = 8
+
+	var stone_mat = StandardMaterial3D.new()
+	stone_mat.albedo_color = Color(0.12, 0.13, 0.17, 1.0)
+	stone_mat.roughness = 0.45
+	stone_mat.metallic = 0.25
+
+	for i in range(corner_coords.size()):
+		var cpos = corner_coords[i]
+		var brazier_node = Node3D.new()
+		brazier_node.name = "CornerBrazier_%d" % i
+		brazier_node.position = cpos
+
+		# Pedestal Column
+		var col_inst = MeshInstance3D.new()
+		col_inst.mesh = col_mesh
+		col_inst.material_override = stone_mat
+		col_inst.position = Vector3(0.0, 0.4, 0.0)
+		brazier_node.add_child(col_inst)
+
+		# Brazier Bowl
+		var bowl_inst = MeshInstance3D.new()
+		bowl_inst.mesh = bowl_mesh
+		bowl_inst.material_override = stone_mat
+		bowl_inst.position = Vector3(0.0, 1.35, 0.0)
+		brazier_node.add_child(bowl_inst)
+
+		# Emissive Flame / Plasma Orb
+		var flame_mat = StandardMaterial3D.new()
+		flame_mat.shading_mode = StandardMaterial3D.SHADING_MODE_UNSHADED
+		flame_mat.albedo_color = Color(1.0, 0.7, 0.2)
+		flame_mat.emission_enabled = true
+		flame_mat.emission = Color(1.0, 0.7, 0.2)
+		flame_mat.emission_energy_multiplier = 3.0
+
+		var flame_inst = MeshInstance3D.new()
+		flame_inst.mesh = orb_mesh
+		flame_inst.material_override = flame_mat
+		flame_inst.position = Vector3(0.0, 1.65, 0.0)
+		brazier_node.add_child(flame_inst)
+		brazier_flames.append(flame_inst)
+
+		# Atmospheric Corner Omni Light
+		var olight = OmniLight3D.new()
+		olight.light_color = Color(1.0, 0.72, 0.25)
+		olight.light_energy = 1.3
+		olight.omni_range = 14.0
+		olight.position = Vector3(0.0, 1.85, 0.0)
+		brazier_node.add_child(olight)
+		brazier_lights.append(olight)
+
+		braziers_root.add_child(brazier_node)
 
 ## Construct 64 physical 3D tile areas with individual colliders for raycast picking
 func _build_3d_tiles() -> void:
@@ -152,7 +317,7 @@ func _sync_3d_pieces() -> void:
 					pieces_root.add_child(piece_node)
 					active_pieces[pos] = piece_node
 
-## Apply active theme materials to the pedestal and pieces
+## Apply active theme materials to the pedestal, notation, braziers, and pieces
 func apply_theme(theme_res: PieceTheme) -> void:
 	if theme_res == null:
 		return
@@ -161,6 +326,57 @@ func apply_theme(theme_res: PieceTheme) -> void:
 		pedestal_mesh.material_override = theme_res.board_material
 
 	_update_tile_materials()
+
+	# Theme-specific staging colors
+	var theme_id = "high_fantasy"
+	if has_node("/root/ThemeManager"):
+		theme_id = get_node("/root/ThemeManager").current_theme
+
+	var notation_color = Color(1.0, 0.85, 0.35, 0.95)
+	var flame_color = Color(1.0, 0.68, 0.2)
+	var rim_color = Color(0.85, 0.92, 1.0)
+	var sky_horizon = Color(0.28, 0.32, 0.42)
+
+	match theme_id:
+		"high_fantasy":
+			notation_color = Color(1.0, 0.85, 0.35, 0.95)
+			flame_color = Color(1.0, 0.68, 0.2)
+			rim_color = Color(0.9, 0.85, 0.75)
+			sky_horizon = Color(0.35, 0.3, 0.38)
+		"cyberpunk":
+			notation_color = Color(0.0, 0.95, 0.88, 0.95)
+			flame_color = Color(0.0, 0.92, 0.85)
+			rim_color = Color(0.0, 0.8, 1.0)
+			sky_horizon = Color(0.05, 0.18, 0.25)
+		"eldritch":
+			notation_color = Color(0.88, 0.4, 1.0, 0.95)
+			flame_color = Color(0.78, 0.22, 0.95)
+			rim_color = Color(0.75, 0.3, 0.95)
+			sky_horizon = Color(0.2, 0.08, 0.28)
+
+	# Update notation labels
+	for label in notation_labels:
+		if is_instance_valid(label):
+			label.modulate = notation_color
+
+	# Update corner braziers
+	for flame in brazier_flames:
+		if is_instance_valid(flame) and flame.material_override is StandardMaterial3D:
+			var mat = flame.material_override as StandardMaterial3D
+			mat.albedo_color = flame_color
+			mat.emission = flame_color
+
+	for olight in brazier_lights:
+		if is_instance_valid(olight):
+			olight.light_color = flame_color
+
+	if is_instance_valid(rim_light):
+		rim_light.light_color = rim_color
+
+	if is_instance_valid(world_env) and world_env.environment and world_env.environment.sky:
+		var sky_mat = world_env.environment.sky.sky_material
+		if sky_mat is ProceduralSkyMaterial:
+			sky_mat.sky_horizon_color = sky_horizon
 
 	for piece in active_pieces.values():
 		if is_instance_valid(piece):
@@ -335,16 +551,13 @@ func _unhandled_input(event: InputEvent) -> void:
 
 	if hit and hit.has("collider"):
 		var collider = hit["collider"]
-		# Check if hit a piece
 		if collider.has_meta("piece_pos"):
 			_handle_interaction(collider.get_meta("piece_pos"))
 			return
-		# Check parent Piece3D
 		var parent = collider.get_parent()
 		if parent is Piece3D:
 			_handle_interaction(parent.board_pos)
 			return
-		# Check tile area
 		for grid_pos in tile_areas.keys():
 			if tile_areas[grid_pos] == collider:
 				_handle_interaction(grid_pos)

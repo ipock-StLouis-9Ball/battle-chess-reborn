@@ -1,7 +1,7 @@
 class_name CinematicCamera
 extends Camera3D
 
-## Heroic 3D Isometric & Duel Action Camera (1988 Battle Chess Style)
+## Heroic 3D Isometric & Action Duel Camera
 ## - Features ~39.5° elevation pitch aimed at board center for full character silhouettes
 ## - Narrow 35° FOV eliminates wide-angle distortion, keeping back-rank Monarchs as prominent as Pawns
 ## - Dynamic dolly zoom plunge during combat duels with impact screenshake
@@ -29,7 +29,7 @@ func _ready() -> void:
 		dd.duel_impact_hit.connect(_on_duel_impact)
 		dd.duel_completed.connect(_on_duel_completed)
 
-## Calculate and restore heroic 1988 Battle Chess overview framing
+## Calculate and restore heroic overview framing
 func reset_to_heroic_overview(duration: float = 0.8) -> void:
 	is_in_duel = false
 	if active_tween and active_tween.is_valid():
