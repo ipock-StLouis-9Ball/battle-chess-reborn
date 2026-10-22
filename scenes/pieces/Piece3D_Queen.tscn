@@ -3,41 +3,45 @@
 [ext_resource type="Script" path="res://scenes/pieces/Piece3D.gd" id="1_piece3d"]
 
 [sub_resource type="CylinderMesh" id="CylinderMesh_queen"]
-top_radius = 0.28
-bottom_radius = 0.48
-height = 1.7
-radial_segments = 16
+top_radius = 0.7
+bottom_radius = 1.08
+height = 5.375
+radial_segments = 20
+rings = 6
 
 [sub_resource type="TorusMesh" id="TorusMesh_ring"]
-inner_radius = 0.6
-outer_radius = 0.75
-rings = 16
-ring_segments = 16
+inner_radius = 1.02
+outer_radius = 1.22
+rings = 24
+ring_segments = 24
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ring"]
 shading_mode = 0
 albedo_color = Color(1, 0.85, 0.2, 1)
+emission_enabled = true
+emission = Color(1, 0.85, 0.2, 1)
+emission_energy_multiplier = 2.5
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_pick"]
-radius = 0.65
-height = 2.1
+radius = 1.05
+height = 5.375
 
 [node name="Piece3D_Queen" type="Node3D"]
 script = ExtResource("1_piece3d")
 piece_type = "Q"
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.85, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.6875, 0)
 mesh = SubResource("CylinderMesh_queen")
 
 [node name="Hand_R_Socket" type="Marker3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.45, 0.95, 0.2)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.05, 3.0, 0.45)
 
 [node name="Head_Socket" type="Marker3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.75, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 5.3, 0)
 
 [node name="SelectionRing" type="MeshInstance3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.04, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.05, 0)
 visible = false
 material_override = SubResource("StandardMaterial3D_ring")
 mesh = SubResource("TorusMesh_ring")
@@ -45,5 +49,5 @@ mesh = SubResource("TorusMesh_ring")
 [node name="PickArea" type="Area3D" parent="."]
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="PickArea"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.05, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.6875, 0)
 shape = SubResource("CapsuleShape3D_pick")

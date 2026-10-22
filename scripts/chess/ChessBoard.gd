@@ -233,8 +233,14 @@ func execute_move(move: Dictionary) -> void:
 		# Trigger Duel Director for battle resolution!
 		current_state = TurnState.DUEL_IN_PROGRESS
 		duel_triggered.emit(piece, victim, to_pos)
-		
-		# Duel resolution will finalize placement:
+
+		if has_node("/root/DuelDirector"):
+			var dd = get_node("/root/DuelDirector")
+			await dd.duel_completed
+		else:
+			await get_tree().create_timer(1.8).timeout
+
+		# Duel resolution finalizes placement:
 		set_piece(from_pos, null)
 		set_piece(to_pos, piece)
 		piece["has_moved"] = true
