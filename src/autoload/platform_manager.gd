@@ -2,14 +2,14 @@ extends Node
 
 ## Universal Platform Manager & Feature Flags
 ## Consolidated Singleton in res://src/autoload/platform_manager.gd
-## Provides 100% universal support for all mobile devices:
-## - All Android devices (Samsung Galaxy, Google Pixel, Xiaomi/Poco, OnePlus, Motorola, Sony, tablets, foldables)
-## - All Apple iOS / iPadOS devices (iPhones with Dynamic Island / notch, iPads)
-## - Dynamic notch / punch-hole / safe-area insets & rotation handling
-## - High-refresh rate displays (60Hz, 90Hz, 120Hz, 144Hz)
-## - Universal tactile haptic feedback with semantic presets
-## - Lifecycle background / resume / back gesture navigation
-## - Unified $9.99 Full Game Unlock monetization across all mobile storefronts and Steam PC
+## Provides 100% universal support for all mobile devices using standard Godot engine features:
+## - Universal detection via OS.has_feature("mobile"), OS.has_feature("android"), OS.has_feature("ios")
+## - Zero vendor-specific string sniffing
+## - Clean DisplayServer.screen_get_refresh_rate() detection
+## - Standard DisplayServer.get_display_safe_area() for punch-holes, notches, and tablet bezels
+## - Universal haptic feedback suite with semantic presets
+## - Lifecycle background / resume / back navigation handling
+## - Unified $9.99 Full Game Unlock monetization across mobile and Steam PC
 
 signal feature_flags_updated()
 signal full_game_unlock_changed(is_unlocked: bool)
@@ -20,30 +20,15 @@ signal orientation_changed(is_landscape: bool)
 enum TargetPlatform {
 	STEAM_PC,
 	STEAM_DECK,
-	ANDROID_SAMSUNG,
-	ANDROID_PIXEL,
-	ANDROID_XIAOMI,
-	ANDROID_GENERIC,
-	IOS_IPHONE,
-	IOS_IPAD,
-	IOS_GENERIC,
-	WEB_MOBILE,
-	WEB_DESKTOP,
-	DESKTOP_GENERIC,
+	ANDROID,
+	IOS,
+	WEB,
 	STANDALONE
-}
-
-enum DeviceFormFactor {
-	PHONE,
-	TABLET,
-	FOLDABLE,
-	DESKTOP,
-	UNKNOWN
 }
 
 # Input Schemes & Platform Types (matching GameEnums integer values)
 const PLATFORM_PC_STEAM: int = 0
-const PLATFORM_ANDROID_SAMSUNG: int = 1
+const PLATFORM_ANDROID_SAMSUNG: int = 1 # Backwards compatibility alias
 const PLATFORM_GENERIC_MOBILE: int = 2
 const PLATFORM_STEAM_DECK: int = 3
 const PLATFORM_WEB: int = 4
@@ -59,23 +44,16 @@ const SAVE_PATH: String = "user://license_data.json"
 var current_platform: TargetPlatform = TargetPlatform.STANDALONE
 var current_platform_type: int = PLATFORM_UNKNOWN
 var current_input_scheme: int = INPUT_KEYBOARD_MOUSE
-var form_factor: DeviceFormFactor = DeviceFormFactor.UNKNOWN
 
-# Device Capabilities & Metadata
+# Universal Device Metadata (zero device-specific sniffing)
 var os_name: String = ""
 var device_model: String = ""
-var device_vendor: String = ""
 var is_touch_device: bool = false
-var is_samsung_galaxy: bool = false
-var is_google_pixel: bool = false
-var is_apple_device: bool = false
-var is_foldable_device: bool = false
-var is_tablet_device: bool = false
+var is_samsung_galaxy: bool = false # Backwards compatibility alias
 
 # Display & Refresh
 var display_refresh_rate: float = 60.0
 var device_refresh_rate: float = 60.0
-var screen_aspect_ratio: float = 1.7778
 var cached_safe_area: Rect2i = Rect2i()
 
 # Feature Flags & Monetization ($9.99 Full Game Unlock)
@@ -99,7 +77,6 @@ func _ready() -> void:
 	_apply_feature_flags()
 	set_process_unhandled_input(true)
 
-	# Connect window / viewport resize for responsive safe-area tracking
 	var root_vp = get_tree().root
 	if is_instance_valid(root_vp):
 		root_vp.size_changed.connect(_on_viewport_size_changed)
@@ -119,106 +96,56 @@ func _notification(what: int) -> void:
 func _detect_platform() -> void:
 	os_name = OS.get_name()
 	device_model = OS.get_model_name()
-	var model_lower = device_model.to_lower()
 
-	# 1. Android Detection (All OEMs)
-	if os_name == "Android" or OS.has_feature("android"):
+	# Universal mobile detection via standard Godot feature tags
+	if OS.has_feature("android") or os_name == "Android":
+		current_platform = TargetPlatform.ANDROID
+		current_platform_type = PLATFORM_GENERIC_MOBILE
 		is_touch_device = true
 		current_input_scheme = INPUT_TOUCH
 		is_steam_edition = false
 		OS.set_restart_on_exit(false)
-
-		# Vendor / OEM Identification
-		if model_lower.begins_with("sm-") or "samsung" in model_lower or "galaxy" in model_lower:
-			is_samsung_galaxy = true
-			device_vendor = "Samsung"
-			current_platform = TargetPlatform.ANDROID_SAMSUNG
-			current_platform_type = PLATFORM_ANDROID_SAMSUNG
-		elif "pixel" in model_lower:
-			is_google_pixel = true
-			device_vendor = "Google"
-			current_platform = TargetPlatform.ANDROID_PIXEL
-			current_platform_type = PLATFORM_GENERIC_MOBILE
-		elif "xiaomi" in model_lower or "redmi" in model_lower or "poco" in model_lower:
-			device_vendor = "Xiaomi"
-			current_platform = TargetPlatform.ANDROID_XIAOMI
-			current_platform_type = PLATFORM_GENERIC_MOBILE
-		else:
-			device_vendor = "Android Generic"
-			current_platform = TargetPlatform.ANDROID_GENERIC
-			current_platform_type = PLATFORM_GENERIC_MOBILE
-
-		_detect_mobile_form_factor()
-
-	# 2. Apple iOS / iPadOS Detection
-	elif os_name in ["iOS", "iPadOS"] or OS.has_feature("ios"):
+	elif OS.has_feature("ios") or os_name in ["iOS", "iPadOS"]:
+		current_platform = TargetPlatform.IOS
+		current_platform_type = PLATFORM_GENERIC_MOBILE
 		is_touch_device = true
-		is_apple_device = true
 		current_input_scheme = INPUT_TOUCH
 		is_steam_edition = false
-		device_vendor = "Apple"
+	elif OS.has_feature("mobile"):
+		current_platform = TargetPlatform.ANDROID
 		current_platform_type = PLATFORM_GENERIC_MOBILE
-
-		if "ipad" in model_lower or os_name == "iPadOS":
-			current_platform = TargetPlatform.IOS_IPAD
-			form_factor = DeviceFormFactor.TABLET
-			is_tablet_device = true
-		else:
-			current_platform = TargetPlatform.IOS_IPHONE
-			form_factor = DeviceFormFactor.PHONE
-
-	# 3. Web Platform (Mobile Browser vs Desktop Browser)
-	elif os_name == "Web" or OS.has_feature("web"):
-		is_touch_device = DisplayServer.is_touchscreen_available() or OS.has_feature("mobile")
-		current_platform_type = PLATFORM_WEB
+		is_touch_device = true
+		current_input_scheme = INPUT_TOUCH
 		is_steam_edition = false
-		device_vendor = "Web Browser"
-
-		if is_touch_device or OS.has_feature("mobile"):
-			current_platform = TargetPlatform.WEB_MOBILE
-			current_input_scheme = INPUT_TOUCH
-			_detect_mobile_form_factor()
-		else:
-			current_platform = TargetPlatform.WEB_DESKTOP
-			current_input_scheme = INPUT_KEYBOARD_MOUSE
-			form_factor = DeviceFormFactor.DESKTOP
-
-	# 4. PC Desktop & Steam Deck
-	elif os_name in ["Windows", "Linux", "macOS"]:
-		if OS.has_feature("steamdeck") or OS.get_environment("SteamDeck") == "1":
-			current_platform = TargetPlatform.STEAM_DECK
-			current_platform_type = PLATFORM_STEAM_DECK
-			current_input_scheme = INPUT_GAMEPAD
-			is_touch_device = true
-			device_vendor = "Valve"
-			form_factor = DeviceFormFactor.PHONE # Handheld form-factor
-		else:
-			current_platform = TargetPlatform.STEAM_PC
-			current_platform_type = PLATFORM_PC_STEAM
-			current_input_scheme = INPUT_KEYBOARD_MOUSE
-			is_touch_device = DisplayServer.is_touchscreen_available()
-			device_vendor = "PC"
-			form_factor = DeviceFormFactor.DESKTOP
+	elif OS.has_feature("steamdeck") or OS.get_environment("SteamDeck") == "1":
+		current_platform = TargetPlatform.STEAM_DECK
+		current_platform_type = PLATFORM_STEAM_DECK
+		current_input_scheme = INPUT_GAMEPAD
+		is_touch_device = true
 		is_steam_edition = true
-
-	# 5. Standalone / Fallback
+	elif OS.has_feature("web") or os_name == "Web":
+		current_platform = TargetPlatform.WEB
+		current_platform_type = PLATFORM_WEB
+		is_touch_device = DisplayServer.is_touchscreen_available() or OS.has_feature("mobile")
+		current_input_scheme = INPUT_TOUCH if is_touch_device else INPUT_KEYBOARD_MOUSE
+		is_steam_edition = false
+	elif os_name in ["Windows", "Linux", "macOS"]:
+		current_platform = TargetPlatform.STEAM_PC
+		current_platform_type = PLATFORM_PC_STEAM
+		current_input_scheme = INPUT_KEYBOARD_MOUSE
+		is_touch_device = DisplayServer.is_touchscreen_available()
+		is_steam_edition = true
 	else:
 		current_platform = TargetPlatform.STANDALONE
 		current_platform_type = PLATFORM_UNKNOWN
 		is_touch_device = DisplayServer.is_touchscreen_available()
 		is_steam_edition = false
-		device_vendor = "Unknown"
-		form_factor = DeviceFormFactor.UNKNOWN
 
-	# Broadcast platform details through EventBus
 	if has_node("/root/EventBus"):
 		var eb = get_node("/root/EventBus")
 		var details = {
 			"os": os_name,
 			"model": device_model,
-			"vendor": device_vendor,
-			"form_factor": get_form_factor_name(),
-			"is_samsung": is_samsung_galaxy,
 			"is_mobile": is_mobile(),
 			"touch_supported": is_touch_device,
 			"platform_type": current_platform_type
@@ -226,43 +153,20 @@ func _detect_platform() -> void:
 		eb.platform_detected.emit(current_platform_type, details)
 		eb.input_scheme_changed.emit(current_input_scheme)
 
-func _detect_mobile_form_factor() -> void:
-	var model_lower = device_model.to_lower()
-	var screen_size = DisplayServer.screen_get_size()
-	var min_dim = mini(screen_size.x, screen_size.y)
-	var max_dim = maxi(screen_size.x, screen_size.y)
-	screen_aspect_ratio = float(max_dim) / float(maxi(1, min_dim))
-
-	# Foldable detection (e.g. Galaxy Z Fold/Flip, Pixel Fold, OnePlus Open)
-	if "fold" in model_lower or "flip" in model_lower or model_lower.begins_with("sm-f"):
-		is_foldable_device = true
-		form_factor = DeviceFormFactor.FOLDABLE
-	# Tablet detection (e.g. Galaxy Tab, Pixel Tablet, iPad, or aspect ratio <= 1.55 with min dim >= 800)
-	elif "tab" in model_lower or model_lower.begins_with("sm-x") or model_lower.begins_with("sm-t") or (screen_aspect_ratio <= 1.55 and min_dim >= 800):
-		is_tablet_device = true
-		form_factor = DeviceFormFactor.TABLET
-	else:
-		form_factor = DeviceFormFactor.PHONE
-
+## Clean, universal refresh rate detection (no invalid FEATURE_SCREEN)
 func _detect_display() -> void:
-	display_refresh_rate = 60.0
-	if DisplayServer.has_feature(DisplayServer.FEATURE_SCREEN):
-		var screen_count = DisplayServer.get_screen_count()
-		if screen_count > 0:
-			var screen_id = DisplayServer.window_get_current_screen()
-			if screen_id >= 0 and screen_id < screen_count:
-				display_refresh_rate = DisplayServer.screen_get_refresh_rate(screen_id)
-			else:
-				display_refresh_rate = DisplayServer.screen_get_refresh_rate(0)
-	if display_refresh_rate <= 0.0:
-		display_refresh_rate = 60.0
-	device_refresh_rate = display_refresh_rate
+	var refresh_rate: float = DisplayServer.screen_get_refresh_rate()
+	if refresh_rate <= 0.0:
+		refresh_rate = 60.0
+	display_refresh_rate = refresh_rate
+	device_refresh_rate = refresh_rate
 
+## Universal safe-area adaptation via standard DisplayServer.get_display_safe_area()
 func _update_safe_area() -> void:
 	var safe_area = DisplayServer.get_display_safe_area()
 	var screen_size = DisplayServer.screen_get_size()
 
-	# If safe area is not initialized or invalid, default to full window
+	# If safe area is empty or uninitialized, fallback to the screen / window bounds
 	if safe_area.size == Vector2i.ZERO:
 		if screen_size != Vector2i.ZERO:
 			safe_area = Rect2i(Vector2i.ZERO, screen_size)
@@ -287,7 +191,6 @@ func _on_viewport_size_changed() -> void:
 			orientation_changed.emit(is_landscape)
 
 func _handle_app_paused() -> void:
-	# Keep game state stable when phone goes into background
 	if has_node("/root/GameManager"):
 		var gm = get_node("/root/GameManager")
 		var st = gm.get("current_state")
@@ -465,65 +368,30 @@ func is_haptics_enabled() -> bool:
 		return get_node("/root/SettingsManager").get("haptics_enabled")
 	return true
 
-# Universal Mobile Detection Helpers
+# Universal Mobile Detection Helpers using Godot standard feature checks
 func is_mobile() -> bool:
-	return is_android() or is_ios() or OS.has_feature("mobile") or (is_touch_device and not is_desktop())
+	return OS.has_feature("mobile") or OS.has_feature("android") or OS.has_feature("ios") or is_android() or is_ios()
 
 func is_android() -> bool:
-	return current_platform in [
-		TargetPlatform.ANDROID_SAMSUNG,
-		TargetPlatform.ANDROID_PIXEL,
-		TargetPlatform.ANDROID_XIAOMI,
-		TargetPlatform.ANDROID_GENERIC
-	] or os_name == "Android" or OS.has_feature("android")
+	return OS.has_feature("android") or os_name == "Android" or current_platform == TargetPlatform.ANDROID
 
 func is_ios() -> bool:
-	return current_platform in [
-		TargetPlatform.IOS_IPHONE,
-		TargetPlatform.IOS_IPAD,
-		TargetPlatform.IOS_GENERIC
-	] or os_name in ["iOS", "iPadOS"] or OS.has_feature("ios")
-
-func is_tablet() -> bool:
-	return is_tablet_device or form_factor == DeviceFormFactor.TABLET
-
-func is_phone() -> bool:
-	return form_factor == DeviceFormFactor.PHONE
-
-func is_foldable() -> bool:
-	return is_foldable_device or form_factor == DeviceFormFactor.FOLDABLE
+	return OS.has_feature("ios") or os_name in ["iOS", "iPadOS"] or current_platform == TargetPlatform.IOS
 
 func is_desktop() -> bool:
-	return current_platform in [
-		TargetPlatform.STEAM_PC,
-		TargetPlatform.STEAM_DECK,
-		TargetPlatform.DESKTOP_GENERIC,
-		TargetPlatform.WEB_DESKTOP
-	]
+	return current_platform in [TargetPlatform.STEAM_PC, TargetPlatform.STEAM_DECK] or (not is_mobile() and os_name in ["Windows", "Linux", "macOS"])
 
 func has_high_refresh_rate() -> bool:
 	return display_refresh_rate >= 89.0
-
-func get_form_factor_name() -> String:
-	match form_factor:
-		DeviceFormFactor.PHONE: return "Phone"
-		DeviceFormFactor.TABLET: return "Tablet"
-		DeviceFormFactor.FOLDABLE: return "Foldable"
-		DeviceFormFactor.DESKTOP: return "Desktop"
-		_: return "Universal Mobile"
 
 func get_device_summary() -> Dictionary:
 	return {
 		"os": os_name,
 		"model": device_model if not device_model.is_empty() else "Standard Mobile",
-		"vendor": device_vendor,
-		"form_factor": get_form_factor_name(),
 		"refresh_rate": device_refresh_rate,
 		"high_refresh_supported": has_high_refresh_rate(),
 		"safe_area_margins": get_safe_area_margins(),
 		"is_mobile": is_mobile(),
-		"is_tablet": is_tablet(),
-		"is_foldable": is_foldable(),
 		"touch_supported": is_touch_device,
 		"full_game_unlocked": has_full_game_unlock,
 		"store_pricing": get_store_pricing_label()
