@@ -43,8 +43,8 @@ func _make_tactical_decision() -> void:
 
 	# 1. Reaction Dodge: If opponent is attacking and in range, chance to dodge!
 	var opponent_attacking = (opponent.current_state == GameEnums.FighterState.ATTACK_LIGHT or
-							  opponent.current_state == GameEnums.FighterState.ATTACK_HEAVY or
-							  opponent.current_state == GameEnums.FighterState.SPECIAL)
+		opponent.current_state == GameEnums.FighterState.ATTACK_HEAVY or
+		opponent.current_state == GameEnums.FighterState.SPECIAL)
 
 	if opponent_attacking and dist < 120.0:
 		var dodge_chance = 0.2

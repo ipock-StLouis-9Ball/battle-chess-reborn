@@ -1,4 +1,4 @@
-class_name ChessBoard
+class_name ChessBoard2D
 extends Control
 
 ## Chess Board Controller
@@ -230,8 +230,7 @@ func _on_duel_completed(winner_side: int, winner_data: Resource, loser_data: Res
 
 		# Pawn promotion check
 		if attacker.type == GameEnums.PieceType.PAWN:
-			if (attacker.color == GameEnums.PieceColor.WHITE and battle_pos.y == 0) or \
-			   (attacker.color == GameEnums.PieceColor.BLACK and battle_pos.y == 7):
+			if (attacker.color == GameEnums.PieceColor.WHITE and battle_pos.y == 0) or (attacker.color == GameEnums.PieceColor.BLACK and battle_pos.y == 7):
 				attacker.type = GameEnums.PieceType.QUEEN
 				attacker._init_stats_by_type()
 				if atk_view:

@@ -386,8 +386,7 @@ func apply_theme(theme_res: PieceTheme) -> void:
 
 ## 3D Tile input routing
 func _on_tile_input_event(_cam: Camera3D, event: InputEvent, _pos: Vector3, _normal: Vector3, _shape_idx: int, grid_pos: Vector2i) -> void:
-	if (event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed) or \
-	   (event is InputEventScreenTouch and event.pressed):
+	if (event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed) or (event is InputEventScreenTouch and event.pressed):
 		_handle_interaction(grid_pos)
 
 func _on_piece_clicked(pos: Vector2i) -> void:

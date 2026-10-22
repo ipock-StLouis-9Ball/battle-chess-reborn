@@ -325,6 +325,5 @@ func play_death_reaction(reaction_type: String = "collapse") -> void:
 			tw.chain().tween_property(self, "scale", Vector3(0.01, 0.01, 0.01), 0.45)
 
 func _on_input_event(_camera: Camera3D, event: InputEvent, _pos: Vector3, _normal: Vector3, _shape_idx: int) -> void:
-	if (event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed) or \
-	   (event is InputEventScreenTouch and event.pressed):
+	if (event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed) or (event is InputEventScreenTouch and event.pressed):
 		clicked.emit(board_pos)

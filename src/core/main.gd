@@ -11,7 +11,7 @@ extends Node
 @onready var victory_screen: VictoryScreen = $Screens/VictoryScreen
 
 @onready var match_container: Control = $GameplayLayers/MatchLayer
-@onready var chess_board: ChessBoard = $GameplayLayers/MatchLayer/ChessBoard
+@onready var chess_board: ChessBoard2D = $GameplayLayers/MatchLayer/ChessBoard
 @onready var match_hud: MatchHUD = $GameplayLayers/MatchLayer/MatchHUD
 
 @onready var duel_container: Control = $GameplayLayers/DuelLayer

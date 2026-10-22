@@ -28,9 +28,7 @@ var device_refresh_rate: float = 60.0
 # Feature Flags
 var is_steam_edition: bool = false
 var has_full_game_unlock: bool = false # Unified $9.99 Mobile Full Game Unlock
-var has_premium_pass: bool:
-	get: return has_full_game_unlock
-	set(val): has_full_game_unlock = val
+var has_premium_pass: bool = false # Backward compatibility alias
 
 var all_themes_unlocked: bool = false
 var all_duels_unlocked: bool = true # Capture duels active across all tiers
@@ -89,6 +87,7 @@ func _load_license_data() -> void:
 	if is_steam_edition:
 		# Steam $9.99 model: full ownership upfront
 		has_full_game_unlock = true
+		has_premium_pass = true
 		return
 
 	# Android license check
@@ -98,6 +97,7 @@ func _load_license_data() -> void:
 			var parsed = JSON.parse_string(file.get_as_text())
 			if parsed is Dictionary:
 				has_full_game_unlock = parsed.get("has_full_game_unlock", parsed.get("has_premium_pass", false))
+				has_premium_pass = has_full_game_unlock
 			file.close()
 
 func _save_license_data() -> void:
@@ -133,6 +133,7 @@ func _apply_feature_flags() -> void:
 ## Unlock Mobile $9.99 Unified 'Full Game Unlock'
 func purchase_full_game() -> void:
 	has_full_game_unlock = true
+	has_premium_pass = true
 	_save_license_data()
 	_apply_feature_flags()
 	full_game_unlock_changed.emit(true)
