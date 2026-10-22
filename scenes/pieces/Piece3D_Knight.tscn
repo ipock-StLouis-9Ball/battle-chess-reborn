@@ -1,0 +1,21 @@
+[gd_scene load_steps=3 format=3 uid="uid://piece3d_knight_001"]
+
+[ext_resource type="Script" path="res://scenes/pieces/Piece3D.gd" id="1_piece3d"]
+
+[sub_resource type="PrismMesh" id="PrismMesh_knight"]
+left_to_right = 0.3
+size = Vector3(0.55, 1.45, 0.75)
+
+[node name="Piece3D_Knight" type="Node3D"]
+script = ExtResource("1_piece3d")
+piece_type = "N"
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.725, 0)
+mesh = SubResource("PrismMesh_knight")
+
+[node name="Hand_R_Socket" type="Marker3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.35, 0.85, 0.2)
+
+[node name="Head_Socket" type="Marker3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.48, 0.15)

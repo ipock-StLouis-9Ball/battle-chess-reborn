@@ -3,6 +3,7 @@ extends Control
 
 ## Visual Board Coordinator
 ## Interfaces with scripts/chess/ChessBoard.gd to render the 8x8 grid & pieces
+## Handles dynamic theme swapping across High Fantasy, Cyberpunk, and Eldritch styles
 
 @export var tile_scene: PackedScene = preload("res://scenes/board/Tile.tscn")
 @export var piece_scene: PackedScene = preload("res://scenes/pieces/Piece.tscn")
@@ -12,6 +13,7 @@ const TILE_SIZE: float = 80.0
 @onready var chess_board: ChessBoard = $ChessLogic
 @onready var grid_container: GridContainer = $CenterContainer/BoardFrame/Grid
 @onready var pieces_layer: Control = $CenterContainer/BoardFrame/PiecesLayer
+@onready var board_frame: PanelContainer = $CenterContainer/BoardFrame
 
 var tiles: Dictionary = {} # Vector2i -> Tile
 var piece_nodes: Dictionary = {} # Vector2i -> Piece
@@ -22,7 +24,13 @@ func _ready() -> void:
 	chess_board.piece_selected.connect(_on_piece_selected)
 	chess_board.selection_cleared.connect(_clear_highlights)
 	chess_board.duel_triggered.connect(_on_duel_triggered)
+	chess_board.theme_swapped.connect(_on_theme_swapped)
+
+	if has_node("/root/ThemeManager"):
+		get_node("/root/ThemeManager").theme_changed.connect(_on_theme_manager_changed)
+
 	_sync_pieces()
+	_refresh_board_theme()
 
 func _build_grid() -> void:
 	for child in grid_container.get_children():
@@ -78,3 +86,24 @@ func _on_duel_triggered(attacker: Dictionary, victim: Dictionary, board_pos: Vec
 	var world_pos = Vector2(board_pos.x * TILE_SIZE + TILE_SIZE * 0.5, board_pos.y * TILE_SIZE + TILE_SIZE * 0.5)
 	if has_node("/root/DuelDirector"):
 		get_node("/root/DuelDirector").start_cinematic_duel(attacker, victim, world_pos)
+
+func _on_theme_swapped(_theme_id: String, _piece_theme: PieceTheme) -> void:
+	_refresh_board_theme()
+	_sync_pieces()
+
+func _on_theme_manager_changed(_theme_id: String, _theme_data: Dictionary) -> void:
+	_refresh_board_theme()
+	_sync_pieces()
+
+## Update board frame border and tile backgrounds to reflect active theme palette
+func _refresh_board_theme() -> void:
+	for tile in tiles.values():
+		if is_instance_valid(tile):
+			tile._update_visuals()
+
+	if has_node("/root/ThemeManager") and is_instance_valid(board_frame):
+		var data = get_node("/root/ThemeManager").get_current_theme_data()
+		var accent = data.get("accent", Color(0.35, 0.4, 0.5))
+		var style = board_frame.get_theme_stylebox("panel")
+		if style is StyleBoxFlat:
+			style.border_color = accent

@@ -1,0 +1,20 @@
+[gd_scene load_steps=3 format=3 uid="uid://piece3d_rook_001"]
+
+[ext_resource type="Script" path="res://scenes/pieces/Piece3D.gd" id="1_piece3d"]
+
+[sub_resource type="BoxMesh" id="BoxMesh_rook"]
+size = Vector3(0.75, 1.35, 0.75)
+
+[node name="Piece3D_Rook" type="Node3D"]
+script = ExtResource("1_piece3d")
+piece_type = "R"
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.675, 0)
+mesh = SubResource("BoxMesh_rook")
+
+[node name="Hand_R_Socket" type="Marker3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.42, 0.75, 0.2)
+
+[node name="Head_Socket" type="Marker3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.38, 0)

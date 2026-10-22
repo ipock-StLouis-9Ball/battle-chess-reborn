@@ -12,6 +12,7 @@ signal selection_cleared()
 signal duel_triggered(attacker: Dictionary, victim: Dictionary, board_pos: Vector2i)
 signal check_declared(king_color: String)
 signal game_over(winner_color: String, reason: String)
+signal theme_swapped(theme_id: String, piece_theme: PieceTheme)
 
 enum TurnState {
 	WHITE_TURN,
@@ -41,11 +42,45 @@ var black_can_castle_kingside: bool = true
 var black_can_castle_queenside: bool = true
 var halfmove_clock: int = 0
 
+# Theme wiring
+var current_theme_id: String = "high_fantasy"
+var current_piece_theme: PieceTheme = null
+
 func _init() -> void:
 	_init_matrix()
 
 func _ready() -> void:
 	load_fen(STARTING_FEN)
+	_connect_theme_manager()
+
+func _connect_theme_manager() -> void:
+	if has_node("/root/ThemeManager"):
+		var tm = get_node("/root/ThemeManager")
+		if tm.has_signal("theme_changed"):
+			tm.theme_changed.connect(_on_theme_changed)
+		if tm.has_signal("piece_theme_changed"):
+			tm.piece_theme_changed.connect(_on_piece_theme_changed)
+		apply_theme(tm.current_theme)
+
+func _on_theme_changed(theme_id: String, _data: Dictionary) -> void:
+	apply_theme(theme_id)
+
+func _on_piece_theme_changed(theme_res: PieceTheme) -> void:
+	if theme_res != null:
+		current_piece_theme = theme_res
+		theme_swapped.emit(current_theme_id, current_piece_theme)
+		board_updated.emit()
+
+## Dynamically apply theme by ID or PieceTheme resource
+func apply_theme(theme_id: String) -> void:
+	current_theme_id = theme_id.to_lower()
+	if has_node("/root/ThemeManager"):
+		current_piece_theme = get_node("/root/ThemeManager").get_piece_theme(current_theme_id)
+	theme_swapped.emit(current_theme_id, current_piece_theme)
+	board_updated.emit()
+
+func get_current_piece_theme() -> PieceTheme:
+	return current_piece_theme
 
 func _init_matrix() -> void:
 	matrix = []

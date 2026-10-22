@@ -11,6 +11,8 @@ signal clicked(pos: Vector2i)
 
 func _ready() -> void:
 	gui_input.connect(_on_gui_input)
+	if has_node("/root/ThemeManager"):
+		get_node("/root/ThemeManager").theme_changed.connect(func(_id, _data): _update_visuals())
 	_update_visuals()
 
 func setup(pos: Vector2i) -> void:
@@ -20,11 +22,15 @@ func setup(pos: Vector2i) -> void:
 		_update_visuals()
 
 func _update_visuals() -> void:
-	var theme_data = ThemeManager.get_current_theme_data() if has_node("/root/ThemeManager") else {}
+	var theme_data = {}
+	if has_node("/root/ThemeManager"):
+		theme_data = get_node("/root/ThemeManager").get_current_theme_data()
+
 	var light_c = theme_data.get("light_square", Color(0.82, 0.84, 0.88))
 	var dark_c = theme_data.get("dark_square", Color(0.24, 0.28, 0.36))
 
-	bg.color = dark_c if is_dark else light_c
+	if bg:
+		bg.color = dark_c if is_dark else light_c
 
 func set_highlight(active: bool, is_capture: bool = false) -> void:
 	highlight.visible = active

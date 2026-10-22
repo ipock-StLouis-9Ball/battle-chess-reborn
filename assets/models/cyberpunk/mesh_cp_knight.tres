@@ -1,0 +1,6 @@
+[gd_resource type="PrismMesh" format=3 uid="uid://mesh_cp_knight_001"]
+
+[resource]
+resource_name = "mesh_cp_knight"
+left_to_right = 0.15
+size = Vector3(0.52, 1.35, 0.95)

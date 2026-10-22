@@ -1,0 +1,9 @@
+[gd_resource type="CylinderMesh" format=3 uid="uid://mesh_hf_queen_001"]
+
+[resource]
+resource_name = "mesh_hf_queen"
+top_radius = 0.28
+bottom_radius = 0.42
+height = 1.9
+radial_segments = 20
+rings = 6

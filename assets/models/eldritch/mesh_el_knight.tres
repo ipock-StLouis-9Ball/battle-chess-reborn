@@ -1,0 +1,8 @@
+[gd_resource type="SphereMesh" format=3 uid="uid://mesh_el_knight_001"]
+
+[resource]
+resource_name = "mesh_el_knight"
+radius = 0.45
+height = 1.3
+radial_segments = 16
+rings = 8

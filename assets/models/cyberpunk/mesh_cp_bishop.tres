@@ -1,0 +1,9 @@
+[gd_resource type="CylinderMesh" format=3 uid="uid://mesh_cp_bishop_001"]
+
+[resource]
+resource_name = "mesh_cp_bishop"
+top_radius = 0.22
+bottom_radius = 0.32
+height = 1.7
+radial_segments = 8
+rings = 4

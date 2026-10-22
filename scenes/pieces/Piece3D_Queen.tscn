@@ -1,0 +1,24 @@
+[gd_scene load_steps=3 format=3 uid="uid://piece3d_queen_001"]
+
+[ext_resource type="Script" path="res://scenes/pieces/Piece3D.gd" id="1_piece3d"]
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_queen"]
+top_radius = 0.28
+bottom_radius = 0.42
+height = 1.9
+radial_segments = 20
+rings = 6
+
+[node name="Piece3D_Queen" type="Node3D"]
+script = ExtResource("1_piece3d")
+piece_type = "Q"
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.95, 0)
+mesh = SubResource("CylinderMesh_queen")
+
+[node name="Hand_R_Socket" type="Marker3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.38, 1.05, 0.18)
+
+[node name="Head_Socket" type="Marker3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.95, 0)

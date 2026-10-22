@@ -1,0 +1,9 @@
+[gd_resource type="CylinderMesh" format=3 uid="uid://mesh_el_king_001"]
+
+[resource]
+resource_name = "mesh_el_king"
+top_radius = 0.46
+bottom_radius = 0.36
+height = 2.35
+radial_segments = 16
+rings = 6

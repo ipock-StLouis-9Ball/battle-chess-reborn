@@ -1,0 +1,26 @@
+[gd_resource type="Resource" script_class="PieceTheme" load_steps=11 format=3 uid="uid://theme_piece_cp_001"]
+
+[ext_resource type="Script" path="res://scripts/themes/PieceTheme.gd" id="1_ptheme"]
+[ext_resource type="Material" uid="uid://mat_board_cyberpunk_001" path="res://assets/materials/mat_board_cyberpunk.tres" id="2_bmat"]
+[ext_resource type="BoxMesh" uid="uid://mesh_cp_pawn_001" path="res://assets/models/cyberpunk/mesh_cp_pawn.tres" id="3_pawn"]
+[ext_resource type="PrismMesh" uid="uid://mesh_cp_knight_001" path="res://assets/models/cyberpunk/mesh_cp_knight.tres" id="4_knight"]
+[ext_resource type="CylinderMesh" uid="uid://mesh_cp_bishop_001" path="res://assets/models/cyberpunk/mesh_cp_bishop.tres" id="5_bishop"]
+[ext_resource type="BoxMesh" uid="uid://mesh_cp_rook_001" path="res://assets/models/cyberpunk/mesh_cp_rook.tres" id="6_rook"]
+[ext_resource type="CapsuleMesh" uid="uid://mesh_cp_queen_001" path="res://assets/models/cyberpunk/mesh_cp_queen.tres" id="7_queen"]
+[ext_resource type="BoxMesh" uid="uid://mesh_cp_king_001" path="res://assets/models/cyberpunk/mesh_cp_king.tres" id="8_king"]
+[ext_resource type="Material" uid="uid://mat_piece_white_001" path="res://assets/materials/mat_piece_white.tres" id="9_wmat"]
+[ext_resource type="Material" uid="uid://mat_piece_black_001" path="res://assets/materials/mat_piece_black.tres" id="10_bmat"]
+
+[resource]
+script = ExtResource("1_ptheme")
+theme_name = "Cyberpunk: Neon Overclock"
+pawn_mesh = ExtResource("3_pawn")
+knight_mesh = ExtResource("4_knight")
+bishop_mesh = ExtResource("5_bishop")
+rook_mesh = ExtResource("6_rook")
+queen_mesh = ExtResource("7_queen")
+king_mesh = ExtResource("8_king")
+board_material = ExtResource("2_bmat")
+emissive_color = Color(0, 0.95, 0.85, 1)
+white_piece_material = ExtResource("9_wmat")
+black_piece_material = ExtResource("10_bmat")

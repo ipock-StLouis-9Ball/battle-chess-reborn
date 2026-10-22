@@ -1,0 +1,24 @@
+[gd_scene load_steps=3 format=3 uid="uid://piece3d_bishop_001"]
+
+[ext_resource type="Script" path="res://scenes/pieces/Piece3D.gd" id="1_piece3d"]
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_bishop"]
+top_radius = 0.15
+bottom_radius = 0.38
+height = 1.65
+radial_segments = 16
+rings = 5
+
+[node name="Piece3D_Bishop" type="Node3D"]
+script = ExtResource("1_piece3d")
+piece_type = "B"
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.825, 0)
+mesh = SubResource("CylinderMesh_bishop")
+
+[node name="Hand_R_Socket" type="Marker3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.34, 0.95, 0.15)
+
+[node name="Head_Socket" type="Marker3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.68, 0)

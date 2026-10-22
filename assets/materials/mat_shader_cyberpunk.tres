@@ -1,0 +1,8 @@
+[gd_resource type="ShaderMaterial" load_steps=2 format=3 uid="uid://mat_shader_cyberpunk_001"]
+
+[ext_resource type="Shader" path="res://assets/shaders/cyberpunk_glitch.gdshader" id="1_glitch"]
+
+[resource]
+shader = ExtResource("1_glitch")
+shader_parameter/glitch_intensity = 0.25
+shader_parameter/scanline_speed = 2.4

@@ -1,0 +1,26 @@
+[gd_resource type="Resource" script_class="PieceTheme" load_steps=11 format=3 uid="uid://theme_piece_el_001"]
+
+[ext_resource type="Script" path="res://scripts/themes/PieceTheme.gd" id="1_ptheme"]
+[ext_resource type="Material" uid="uid://mat_board_eldritch_001" path="res://assets/materials/mat_board_eldritch.tres" id="2_bmat"]
+[ext_resource type="CapsuleMesh" uid="uid://mesh_el_pawn_001" path="res://assets/models/eldritch/mesh_el_pawn.tres" id="3_pawn"]
+[ext_resource type="SphereMesh" uid="uid://mesh_el_knight_001" path="res://assets/models/eldritch/mesh_el_knight.tres" id="4_knight"]
+[ext_resource type="CylinderMesh" uid="uid://mesh_el_bishop_001" path="res://assets/models/eldritch/mesh_el_bishop.tres" id="5_bishop"]
+[ext_resource type="BoxMesh" uid="uid://mesh_el_rook_001" path="res://assets/models/eldritch/mesh_el_rook.tres" id="6_rook"]
+[ext_resource type="CapsuleMesh" uid="uid://mesh_el_queen_001" path="res://assets/models/eldritch/mesh_el_queen.tres" id="7_queen"]
+[ext_resource type="CylinderMesh" uid="uid://mesh_el_king_001" path="res://assets/models/eldritch/mesh_el_king.tres" id="8_king"]
+[ext_resource type="Material" uid="uid://mat_piece_white_001" path="res://assets/materials/mat_piece_white.tres" id="9_wmat"]
+[ext_resource type="Material" uid="uid://mat_piece_black_001" path="res://assets/materials/mat_piece_black.tres" id="10_bmat"]
+
+[resource]
+script = ExtResource("1_ptheme")
+theme_name = "Eldritch: Abyssal Madness"
+pawn_mesh = ExtResource("3_pawn")
+knight_mesh = ExtResource("4_knight")
+bishop_mesh = ExtResource("5_bishop")
+rook_mesh = ExtResource("6_rook")
+queen_mesh = ExtResource("7_queen")
+king_mesh = ExtResource("8_king")
+board_material = ExtResource("2_bmat")
+emissive_color = Color(0.85, 0.25, 0.95, 1)
+white_piece_material = ExtResource("9_wmat")
+black_piece_material = ExtResource("10_bmat")

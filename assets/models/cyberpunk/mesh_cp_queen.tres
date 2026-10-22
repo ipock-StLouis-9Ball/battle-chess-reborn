@@ -1,0 +1,8 @@
+[gd_resource type="CapsuleMesh" format=3 uid="uid://mesh_cp_queen_001"]
+
+[resource]
+resource_name = "mesh_cp_queen"
+radius = 0.32
+height = 1.95
+radial_segments = 16
+rings = 4

@@ -1,0 +1,9 @@
+[gd_resource type="CylinderMesh" format=3 uid="uid://mesh_hf_pawn_001"]
+
+[resource]
+resource_name = "mesh_hf_pawn"
+top_radius = 0.22
+bottom_radius = 0.35
+height = 1.1
+radial_segments = 16
+rings = 4
