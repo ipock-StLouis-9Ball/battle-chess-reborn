@@ -1,0 +1,123 @@
+[gd_scene load_steps=7 format=3 uid="uid://dhud00123"]
+
+[ext_resource type="Script" path="res://src/ui/screens/duel_hud.gd" id="1_dhud"]
+[ext_resource type="Script" path="res://src/ui/common/safe_area_container.gd" id="2_safe"]
+[ext_resource type="PackedScene" path="res://src/input/virtual_joystick.tscn" id="3_vjoy"]
+[ext_resource type="PackedScene" path="res://src/input/touch_action_buttons.tscn" id="4_tbtn"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_hp_fill_atk"]
+bg_color = Color(0.2, 0.75, 0.95, 1)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_hp_fill_def"]
+bg_color = Color(0.95, 0.25, 0.25, 1)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
+[node name="DuelHUD" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("1_dhud")
+
+[node name="SafeArea" type="MarginContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("2_safe")
+extra_padding = 24
+
+[node name="CombatantBars" type="HBoxContainer" parent="SafeArea"]
+layout_mode = 2
+size_flags_vertical = 0
+theme_override_constants/separation = 40
+alignment = 1
+
+[node name="AttackerBox" type="HBoxContainer" parent="SafeArea/CombatantBars"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 12
+
+[node name="IconLabel" type="Label" parent="SafeArea/CombatantBars/AttackerBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 40
+text = "♘"
+
+[node name="VBox" type="VBoxContainer" parent="SafeArea/CombatantBars/AttackerBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="NameLabel" type="Label" parent="SafeArea/CombatantBars/AttackerBox/VBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "Knight (White)"
+
+[node name="HPBar" type="ProgressBar" parent="SafeArea/CombatantBars/AttackerBox/VBox"]
+custom_minimum_size = Vector2(0, 16)
+layout_mode = 2
+theme_override_styles/fill = SubResource("StyleBoxFlat_hp_fill_atk")
+value = 100.0
+show_percentage = false
+
+[node name="VsLabel" type="Label" parent="SafeArea/CombatantBars"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.85, 0.2, 1)
+theme_override_font_sizes/font_size = 28
+text = "VS"
+
+[node name="DefenderBox" type="HBoxContainer" parent="SafeArea/CombatantBars"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 12
+
+[node name="VBox" type="VBoxContainer" parent="SafeArea/CombatantBars/DefenderBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="NameLabel" type="Label" parent="SafeArea/CombatantBars/DefenderBox/VBox"]
+layout_mode = 2
+text = "Rook (Black)"
+horizontal_alignment = 2
+
+[node name="HPBar" type="ProgressBar" parent="SafeArea/CombatantBars/DefenderBox/VBox"]
+custom_minimum_size = Vector2(0, 16)
+layout_mode = 2
+theme_override_styles/fill = SubResource("StyleBoxFlat_hp_fill_def")
+fill_mode = 1
+value = 100.0
+show_percentage = false
+
+[node name="IconLabel" type="Label" parent="SafeArea/CombatantBars/DefenderBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 40
+text = "♜"
+
+[node name="TouchControls" type="Control" parent="SafeArea"]
+layout_mode = 2
+mouse_filter = 2
+
+[node name="VirtualJoystick" parent="SafeArea/TouchControls" instance=ExtResource("3_vjoy")]
+layout_mode = 1
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_top = -220.0
+offset_right = 220.0
+offset_bottom = 0.0
+grow_vertical = 0
+
+[node name="TouchActionButtons" parent="SafeArea/TouchControls" instance=ExtResource("4_tbtn")]
+layout_mode = 1

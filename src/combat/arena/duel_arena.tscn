@@ -1,0 +1,121 @@
+[gd_scene load_steps=7 format=3 uid="uid://darena00123"]
+
+[ext_resource type="Script" path="res://src/combat/arena/duel_arena.gd" id="1_arena"]
+[ext_resource type="Script" path="res://src/combat/arena/duel_camera.gd" id="2_cam"]
+
+[sub_resource type="WorldBoundaryShape2D" id="WorldBoundaryShape2D_top"]
+normal = Vector2(0, 1)
+distance = -280.0
+
+[sub_resource type="WorldBoundaryShape2D" id="WorldBoundaryShape2D_bottom"]
+distance = -280.0
+
+[sub_resource type="WorldBoundaryShape2D" id="WorldBoundaryShape2D_left"]
+normal = Vector2(1, 0)
+distance = -500.0
+
+[sub_resource type="WorldBoundaryShape2D" id="WorldBoundaryShape2D_right"]
+normal = Vector2(-1, 0)
+distance = -500.0
+
+[node name="DuelArena" type="Node2D"]
+script = ExtResource("1_arena")
+
+[node name="BackgroundFloor" type="ColorRect" parent="."]
+custom_minimum_size = Vector2(1200, 700)
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -600.0
+offset_top = -350.0
+offset_right = 600.0
+offset_bottom = 350.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.12, 0.14, 0.18, 1)
+
+[node name="ArenaRing" type="ReferenceRect" parent="."]
+custom_minimum_size = Vector2(1000, 560)
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -500.0
+offset_top = -280.0
+offset_right = 500.0
+offset_bottom = 280.0
+grow_horizontal = 2
+grow_vertical = 2
+border_color = Color(0.85, 0.65, 0.2, 0.6)
+border_width = 4.0
+editor_only = false
+
+[node name="ArenaBoundaries" type="StaticBody2D" parent="."]
+collision_mask = 2
+
+[node name="WallTop" type="CollisionShape2D" parent="ArenaBoundaries"]
+shape = SubResource("WorldBoundaryShape2D_top")
+
+[node name="WallBottom" type="CollisionShape2D" parent="ArenaBoundaries"]
+shape = SubResource("WorldBoundaryShape2D_bottom")
+
+[node name="WallLeft" type="CollisionShape2D" parent="ArenaBoundaries"]
+shape = SubResource("WorldBoundaryShape2D_left")
+
+[node name="WallRight" type="CollisionShape2D" parent="ArenaBoundaries"]
+shape = SubResource("WorldBoundaryShape2D_right")
+
+[node name="SpawnPoints" type="Node2D" parent="."]
+
+[node name="SpawnLeft" type="Marker2D" parent="SpawnPoints"]
+position = Vector2(-260, 0)
+
+[node name="SpawnRight" type="Marker2D" parent="SpawnPoints"]
+position = Vector2(260, 0)
+
+[node name="DuelCamera" type="Camera2D" parent="."]
+position_smoothing_enabled = true
+position_smoothing_speed = 8.0
+script = ExtResource("2_cam")
+
+[node name="CanvasLayer" type="CanvasLayer" parent="."]
+
+[node name="TimerLabel" type="Label" parent="CanvasLayer"]
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -50.0
+offset_top = 24.0
+offset_right = 50.0
+offset_bottom = 72.0
+grow_horizontal = 2
+theme_override_colors/font_color = Color(1, 0.9, 0.3, 1)
+theme_override_font_sizes/font_size = 36
+text = "30"
+horizontal_alignment = 1
+
+[node name="AnnouncementLabel" type="Label" parent="CanvasLayer"]
+visible = false
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -300.0
+offset_top = -60.0
+offset_right = 300.0
+offset_bottom = 60.0
+grow_horizontal = 2
+grow_vertical = 2
+pivot_offset = Vector2(300, 60)
+theme_override_colors/font_color = Color(1, 0.85, 0.2, 1)
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.9)
+theme_override_constants/shadow_offset_x = 4
+theme_override_constants/shadow_offset_y = 4
+theme_override_font_sizes/font_size = 64
+text = "FIGHT!"
+horizontal_alignment = 1
+vertical_alignment = 1

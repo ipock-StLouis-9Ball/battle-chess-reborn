@@ -1,0 +1,78 @@
+[gd_scene load_steps=5 format=3 uid="uid://fgt00123base"]
+
+[ext_resource type="Script" path="res://src/combat/fighters/fighter_base.gd" id="1_fbase"]
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_body"]
+radius = 24.0
+height = 68.0
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_hurt"]
+radius = 26.0
+height = 72.0
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_hit"]
+size = Vector2(48, 60)
+
+[node name="FighterBase" type="CharacterBody2D"]
+collision_layer = 2
+collision_mask = 1
+motion_mode = 1
+script = ExtResource("1_fbase")
+
+[node name="BodyCollision" type="CollisionShape2D" parent="."]
+shape = SubResource("CapsuleShape2D_body")
+
+[node name="HurtBox" type="Area2D" parent="."]
+collision_layer = 4
+collision_mask = 0
+
+[node name="HurtShape" type="CollisionShape2D" parent="HurtBox"]
+shape = SubResource("CapsuleShape2D_hurt")
+debug_color = Color(0, 0.6, 0.7, 0.2)
+
+[node name="Visuals" type="Node2D" parent="."]
+
+[node name="BodyRect" type="ColorRect" parent="Visuals"]
+custom_minimum_size = Vector2(50, 70)
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -25.0
+offset_top = -35.0
+offset_right = 25.0
+offset_bottom = 35.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.9, 0.92, 0.96, 0.95)
+
+[node name="SymbolLabel" type="Label" parent="Visuals"]
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -30.0
+offset_top = -35.0
+offset_right = 30.0
+offset_bottom = 35.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/shadow_offset_x = 2
+theme_override_constants/shadow_offset_y = 2
+theme_override_font_sizes/font_size = 50
+text = "♟"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="HitBox" type="Area2D" parent="Visuals"]
+collision_layer = 0
+collision_mask = 4
+monitoring = false
+monitorable = false
+
+[node name="HitShape" type="CollisionShape2D" parent="Visuals/HitBox"]
+position = Vector2(32, 0)
+shape = SubResource("RectangleShape2D_hit")
+debug_color = Color(0.95, 0.1, 0.2, 0.4)

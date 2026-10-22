@@ -1,0 +1,245 @@
+[gd_scene load_steps=3 format=3 uid="uid://smenu00123"]
+
+[ext_resource type="Script" path="res://src/ui/screens/settings_menu.gd" id="1_smenu"]
+[ext_resource type="Script" path="res://src/ui/common/safe_area_container.gd" id="2_safe"]
+
+[node name="SettingsMenu" type="Control"]
+process_mode = 3
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_smenu")
+
+[node name="Background" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.06, 0.07, 0.1, 0.96)
+
+[node name="SafeArea" type="MarginContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("2_safe")
+extra_padding = 30
+
+[node name="Scroll" type="ScrollContainer" parent="SafeArea"]
+layout_mode = 2
+horizontal_scroll_mode = 0
+
+[node name="Content" type="VBoxContainer" parent="SafeArea/Scroll"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 24
+
+[node name="Title" type="Label" parent="SafeArea/Scroll/Content"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.85, 0.25, 1)
+theme_override_font_sizes/font_size = 38
+text = "SETTINGS & PREFERENCES"
+horizontal_alignment = 1
+
+[node name="AudioSection" type="VBoxContainer" parent="SafeArea/Scroll/Content"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="SectionTitle" type="Label" parent="SafeArea/Scroll/Content/AudioSection"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.4, 0.75, 1, 1)
+theme_override_font_sizes/font_size = 22
+text = "AUDIO"
+
+[node name="MasterRow" type="HBoxContainer" parent="SafeArea/Scroll/Content/AudioSection"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="SafeArea/Scroll/Content/AudioSection/MasterRow"]
+custom_minimum_size = Vector2(200, 0)
+layout_mode = 2
+text = "Master Volume"
+
+[node name="Slider" type="HSlider" parent="SafeArea/Scroll/Content/AudioSection/MasterRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+value = 80.0
+
+[node name="MusicRow" type="HBoxContainer" parent="SafeArea/Scroll/Content/AudioSection"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="SafeArea/Scroll/Content/AudioSection/MusicRow"]
+custom_minimum_size = Vector2(200, 0)
+layout_mode = 2
+text = "Music Volume"
+
+[node name="Slider" type="HSlider" parent="SafeArea/Scroll/Content/AudioSection/MusicRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+value = 70.0
+
+[node name="SFXRow" type="HBoxContainer" parent="SafeArea/Scroll/Content/AudioSection"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="SafeArea/Scroll/Content/AudioSection/SFXRow"]
+custom_minimum_size = Vector2(200, 0)
+layout_mode = 2
+text = "SFX & Combat Volume"
+
+[node name="Slider" type="HSlider" parent="SafeArea/Scroll/Content/AudioSection/SFXRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+value = 85.0
+
+[node name="HSeparator1" type="HSeparator" parent="SafeArea/Scroll/Content"]
+layout_mode = 2
+
+[node name="DisplaySection" type="VBoxContainer" parent="SafeArea/Scroll/Content"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="SectionTitle" type="Label" parent="SafeArea/Scroll/Content/DisplaySection"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.4, 0.75, 1, 1)
+theme_override_font_sizes/font_size = 22
+text = "DISPLAY & PERFORMANCE (Steam PC / Samsung Galaxy AMOLED)"
+
+[node name="FPSRow" type="HBoxContainer" parent="SafeArea/Scroll/Content/DisplaySection"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="SafeArea/Scroll/Content/DisplaySection/FPSRow"]
+custom_minimum_size = Vector2(200, 0)
+layout_mode = 2
+text = "Target Framerate"
+
+[node name="Option" type="OptionButton" parent="SafeArea/Scroll/Content/DisplaySection/FPSRow"]
+custom_minimum_size = Vector2(240, 0)
+layout_mode = 2
+
+[node name="VSyncRow" type="HBoxContainer" parent="SafeArea/Scroll/Content/DisplaySection"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="SafeArea/Scroll/Content/DisplaySection/VSyncRow"]
+custom_minimum_size = Vector2(200, 0)
+layout_mode = 2
+text = "V-Sync"
+
+[node name="CheckBox" type="CheckBox" parent="SafeArea/Scroll/Content/DisplaySection/VSyncRow"]
+layout_mode = 2
+button_pressed = true
+
+[node name="FullscreenRow" type="HBoxContainer" parent="SafeArea/Scroll/Content/DisplaySection"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="SafeArea/Scroll/Content/DisplaySection/FullscreenRow"]
+custom_minimum_size = Vector2(200, 0)
+layout_mode = 2
+text = "Fullscreen Mode (PC)"
+
+[node name="CheckBox" type="CheckBox" parent="SafeArea/Scroll/Content/DisplaySection/FullscreenRow"]
+layout_mode = 2
+
+[node name="HSeparator2" type="HSeparator" parent="SafeArea/Scroll/Content"]
+layout_mode = 2
+
+[node name="MobileSection" type="VBoxContainer" parent="SafeArea/Scroll/Content"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="SectionTitle" type="Label" parent="SafeArea/Scroll/Content/MobileSection"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.4, 0.75, 1, 1)
+theme_override_font_sizes/font_size = 22
+text = "TOUCH CONTROLS & HAPTICS"
+
+[node name="TouchControlsRow" type="HBoxContainer" parent="SafeArea/Scroll/Content/MobileSection"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="SafeArea/Scroll/Content/MobileSection/TouchControlsRow"]
+custom_minimum_size = Vector2(200, 0)
+layout_mode = 2
+text = "Show Touch Controls"
+
+[node name="CheckBox" type="CheckBox" parent="SafeArea/Scroll/Content/MobileSection/TouchControlsRow"]
+layout_mode = 2
+button_pressed = true
+
+[node name="OpacityRow" type="HBoxContainer" parent="SafeArea/Scroll/Content/MobileSection"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="SafeArea/Scroll/Content/MobileSection/OpacityRow"]
+custom_minimum_size = Vector2(200, 0)
+layout_mode = 2
+text = "Touch Controls Opacity"
+
+[node name="Slider" type="HSlider" parent="SafeArea/Scroll/Content/MobileSection/OpacityRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+value = 85.0
+
+[node name="HapticsRow" type="HBoxContainer" parent="SafeArea/Scroll/Content/MobileSection"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="SafeArea/Scroll/Content/MobileSection/HapticsRow"]
+custom_minimum_size = Vector2(200, 0)
+layout_mode = 2
+text = "Vibration / Haptic Feedback"
+
+[node name="CheckBox" type="CheckBox" parent="SafeArea/Scroll/Content/MobileSection/HapticsRow"]
+layout_mode = 2
+button_pressed = true
+
+[node name="HSeparator3" type="HSeparator" parent="SafeArea/Scroll/Content"]
+layout_mode = 2
+
+[node name="GameplaySection" type="VBoxContainer" parent="SafeArea/Scroll/Content"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="SectionTitle" type="Label" parent="SafeArea/Scroll/Content/GameplaySection"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.4, 0.75, 1, 1)
+theme_override_font_sizes/font_size = 22
+text = "GAMEPLAY & BATTLE RULES"
+
+[node name="AutoDuelRow" type="HBoxContainer" parent="SafeArea/Scroll/Content/GameplaySection"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="SafeArea/Scroll/Content/GameplaySection/AutoDuelRow"]
+custom_minimum_size = Vector2(200, 0)
+layout_mode = 2
+text = "Fast Auto-Resolve Duels"
+
+[node name="CheckBox" type="CheckBox" parent="SafeArea/Scroll/Content/GameplaySection/AutoDuelRow"]
+layout_mode = 2
+
+[node name="DifficultyRow" type="HBoxContainer" parent="SafeArea/Scroll/Content/GameplaySection"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="SafeArea/Scroll/Content/GameplaySection/DifficultyRow"]
+custom_minimum_size = Vector2(200, 0)
+layout_mode = 2
+text = "AI Duel Difficulty"
+
+[node name="Option" type="OptionButton" parent="SafeArea/Scroll/Content/GameplaySection/DifficultyRow"]
+custom_minimum_size = Vector2(240, 0)
+layout_mode = 2
+
+[node name="DeviceInfoLabel" type="Label" parent="SafeArea/Scroll/Content"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.5, 0.55, 0.65, 1)
+theme_override_font_sizes/font_size = 14
+text = "Device Info..."
+
+[node name="BtnBack" type="Button" parent="SafeArea/Scroll/Content"]
+custom_minimum_size = Vector2(200, 52)
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_font_sizes/font_size = 20
+text = "💾  SAVE & RETURN"

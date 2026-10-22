@@ -1,0 +1,72 @@
+[gd_scene load_steps=10 format=3 uid="uid://main00123"]
+
+[ext_resource type="Script" path="res://src/core/main.gd" id="1_main"]
+[ext_resource type="PackedScene" path="res://src/chess/board/chess_board.tscn" id="2_board"]
+[ext_resource type="PackedScene" path="res://src/ui/screens/match_hud.tscn" id="3_mhud"]
+[ext_resource type="PackedScene" path="res://src/combat/arena/duel_arena.tscn" id="4_arena"]
+[ext_resource type="PackedScene" path="res://src/ui/screens/duel_hud.tscn" id="5_dhud"]
+[ext_resource type="PackedScene" path="res://src/ui/screens/splash_screen.tscn" id="6_splash"]
+[ext_resource type="PackedScene" path="res://src/ui/screens/main_menu.tscn" id="7_mmenu"]
+[ext_resource type="PackedScene" path="res://src/ui/screens/settings_menu.tscn" id="8_smenu"]
+[ext_resource type="PackedScene" path="res://src/ui/screens/pause_menu.tscn" id="9_pmenu"]
+[ext_resource type="PackedScene" path="res://src/ui/screens/victory_screen.tscn" id="10_vscreen"]
+
+[node name="Main" type="Node"]
+script = ExtResource("1_main")
+
+[node name="GameplayLayers" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="MatchLayer" type="Control" parent="GameplayLayers"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="ChessBoard" parent="GameplayLayers/MatchLayer" instance=ExtResource("2_board")]
+layout_mode = 1
+
+[node name="MatchHUD" parent="GameplayLayers/MatchLayer" instance=ExtResource("3_mhud")]
+layout_mode = 1
+
+[node name="DuelLayer" type="Control" parent="GameplayLayers"]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="DuelArena" parent="GameplayLayers/DuelLayer" instance=ExtResource("4_arena")]
+position = Vector2(960, 540)
+
+[node name="DuelHUD" parent="GameplayLayers/DuelLayer" instance=ExtResource("5_dhud")]
+layout_mode = 1
+
+[node name="Screens" type="CanvasLayer" parent="."]
+layer = 5
+
+[node name="SplashScreen" parent="Screens" instance=ExtResource("6_splash")]
+
+[node name="MainMenu" parent="Screens" instance=ExtResource("7_mmenu")]
+visible = false
+
+[node name="SettingsMenu" parent="Screens" instance=ExtResource("8_smenu")]
+visible = false
+
+[node name="PauseMenu" parent="Screens" instance=ExtResource("9_pmenu")]
+visible = false
+
+[node name="VictoryScreen" parent="Screens" instance=ExtResource("10_vscreen")]
+visible = false

@@ -1,0 +1,29 @@
+# Godot 4 Git Ignore
+.godot/
+*.translation
+*.import
+
+# Exported binaries
+export/
+bin/
+build/
+*.apk
+*.aab
+*.exe
+*.pck
+*.dmg
+*.zip
+
+# Mono / C# (if added in future)
+.mono/
+data_*/
+mono_crash.*.json
+
+# OS and Editor metadata
+.DS_Store
+Thumbs.db
+*.swp
+*~
+.idea/
+.vscode/
+*.tmp

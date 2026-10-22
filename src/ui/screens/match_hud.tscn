@@ -1,0 +1,88 @@
+[gd_scene load_steps=3 format=3 uid="uid://mhud00123"]
+
+[ext_resource type="Script" path="res://src/ui/screens/match_hud.gd" id="1_mhud"]
+[ext_resource type="Script" path="res://src/ui/common/safe_area_container.gd" id="2_safe"]
+
+[node name="MatchHUD" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("1_mhud")
+
+[node name="SafeArea" type="MarginContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("2_safe")
+extra_padding = 20
+
+[node name="TopBar" type="HBoxContainer" parent="SafeArea"]
+layout_mode = 2
+size_flags_vertical = 0
+mouse_filter = 2
+
+[node name="TurnBox" type="HBoxContainer" parent="SafeArea/TopBar"]
+layout_mode = 2
+size_flags_horizontal = 2
+theme_override_constants/separation = 12
+
+[node name="TurnIcon" type="Label" parent="SafeArea/TopBar/TurnBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 36
+text = "♔"
+
+[node name="TurnLabel" type="Label" parent="SafeArea/TopBar/TurnBox"]
+layout_mode = 2
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.8)
+theme_override_constants/shadow_offset_x = 2
+theme_override_constants/shadow_offset_y = 2
+theme_override_font_sizes/font_size = 24
+text = "WHITE'S TURN (Turn 1)"
+
+[node name="CheckBanner" type="Label" parent="SafeArea/TopBar"]
+visible = false
+layout_mode = 2
+size_flags_horizontal = 6
+theme_override_colors/font_color = Color(1, 0.2, 0.25, 1)
+theme_override_font_sizes/font_size = 26
+text = "⚠️ CHECK!"
+
+[node name="BtnPause" type="Button" parent="SafeArea/TopBar"]
+custom_minimum_size = Vector2(54, 54)
+layout_mode = 2
+size_flags_horizontal = 8
+theme_override_font_sizes/font_size = 24
+text = "⏸"
+
+[node name="BottomBar" type="HBoxContainer" parent="SafeArea"]
+layout_mode = 2
+size_flags_vertical = 8
+mouse_filter = 2
+
+[node name="WhiteCaptures" type="HBoxContainer" parent="SafeArea/BottomBar"]
+layout_mode = 2
+size_flags_horizontal = 2
+
+[node name="CountLabel" type="Label" parent="SafeArea/BottomBar/WhiteCaptures"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.85, 0.9, 1, 1)
+theme_override_font_sizes/font_size = 18
+text = "White Captures: 0"
+
+[node name="BlackCaptures" type="HBoxContainer" parent="SafeArea/BottomBar"]
+layout_mode = 2
+size_flags_horizontal = 8
+
+[node name="CountLabel" type="Label" parent="SafeArea/BottomBar/BlackCaptures"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.8, 0.8, 1)
+theme_override_font_sizes/font_size = 18
+text = "Black Captures: 0"
