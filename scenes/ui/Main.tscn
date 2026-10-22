@@ -1,9 +1,10 @@
-[gd_scene load_steps=5 format=3 uid="uid://main_sc_001"]
+[gd_scene load_steps=6 format=3 uid="uid://main_sc_001"]
 
 [ext_resource type="Script" path="res://scenes/ui/Main.gd" id="1_mview"]
 [ext_resource type="PackedScene" path="res://scenes/board/Board.tscn" id="2_board"]
 [ext_resource type="PackedScene" path="res://scenes/duel_arena/DuelArena.tscn" id="3_arena"]
 [ext_resource type="PackedScene" path="res://scenes/camera/CinematicCamera.tscn" id="4_cam"]
+[ext_resource type="PackedScene" path="res://scenes/board/Board3D.tscn" id="5_b3d"]
 
 [node name="Main" type="Control"]
 layout_mode = 3
@@ -25,7 +26,24 @@ color = Color(0.06, 0.07, 0.09, 1)
 
 [node name="CinematicCamera" parent="." instance=ExtResource("4_cam")]
 
-[node name="Board" parent="." instance=ExtResource("2_board")]
+[node name="Board3DContainer" type="SubViewportContainer" parent="."]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+stretch = true
+
+[node name="SubViewport" type="SubViewport" parent="Board3DContainer"]
+handle_input_locally = false
+size = Vector2i(1920, 1080)
+render_target_update_mode = 0
+
+[node name="Board3D" parent="Board3DContainer/SubViewport" instance=ExtResource("5_b3d")]
+
+[node name="Board2D" parent="." instance=ExtResource("2_board")]
 layout_mode = 1
 
 [node name="DuelArena" parent="." instance=ExtResource("3_arena")]
@@ -41,7 +59,7 @@ offset_top = 20.0
 offset_right = -30.0
 offset_bottom = 60.0
 grow_horizontal = 2
-theme_override_constants/separation = 30
+theme_override_constants/separation = 24
 
 [node name="TurnLabel" type="Label" parent="HUD/TopBar"]
 layout_mode = 2
@@ -65,6 +83,11 @@ layout_mode = 2
 size_flags_horizontal = 10
 theme_override_font_sizes/font_size = 22
 text = "🎖️ Platinum II (1450 Elo)"
+
+[node name="BtnViewToggle" type="Button" parent="HUD/TopBar"]
+custom_minimum_size = Vector2(180, 0)
+layout_mode = 2
+text = "🎥 View: 2D Tactical"
 
 [node name="BottomBar" type="HBoxContainer" parent="HUD"]
 anchors_preset = 12
