@@ -91,13 +91,19 @@ func _on_game_over(winner_color: String, reason: String) -> void:
 	# Calculate Ranked Elo adjustment
 	var score = 1.0 if winner_color == "white" else (0.5 if winner_color == "draw" else 0.0)
 	var opponent_elo = 1420
-	var elo_result = EloCalculator.calculate_rating_change(player_elo, opponent_elo, score)
-	player_elo = elo_result["player_a"]["new_rating"]
+	if has_node("/root/EloCalculator"):
+		var ec = get_node("/root/EloCalculator")
+		var elo_result = ec.calculate_rating_change(player_elo, opponent_elo, score)
+		player_elo = elo_result["player_a"]["new_rating"]
 	_update_elo_display()
 
 func _update_elo_display() -> void:
-	var division = EloCalculator.get_division_label(player_elo)
-	var color = EloCalculator.get_tier_color(player_elo)
+	var division = "Platinum II"
+	var color = Color(0.3, 0.95, 0.75, 1.0)
+	if has_node("/root/EloCalculator"):
+		var ec = get_node("/root/EloCalculator")
+		division = ec.get_division_label(player_elo)
+		color = ec.get_tier_color(player_elo)
 	elo_badge.text = "🎖️ %s (%d Elo)" % [division, player_elo]
 	elo_badge.add_theme_color_override("font_color", color)
 

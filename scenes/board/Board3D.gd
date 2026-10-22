@@ -49,6 +49,8 @@ func _ready() -> void:
 
 	_build_board_staging()
 	_build_3d_tiles()
+	if is_instance_valid(camera_3d):
+		camera_3d.make_current()
 	if has_node("/root/ThemeManager"):
 		get_node("/root/ThemeManager").piece_theme_changed.connect(apply_theme)
 		apply_theme(get_node("/root/ThemeManager").get_current_piece_theme())

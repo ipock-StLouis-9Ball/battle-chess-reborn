@@ -65,9 +65,16 @@ func _detect_platform() -> void:
 		is_steam_edition = false
 
 func _detect_display() -> void:
-	var screen_id = DisplayServer.window_get_current_screen()
-	display_refresh_rate = DisplayServer.screen_get_refresh_rate(screen_id)
-	if display_refresh_rate <= 0:
+	display_refresh_rate = 60.0
+	if DisplayServer.has_feature(DisplayServer.FEATURE_SCREEN):
+		var screen_count = DisplayServer.get_screen_count()
+		if screen_count > 0:
+			var screen_id = DisplayServer.window_get_current_screen()
+			if screen_id >= 0 and screen_id < screen_count:
+				display_refresh_rate = DisplayServer.screen_get_refresh_rate(screen_id)
+			else:
+				display_refresh_rate = DisplayServer.screen_get_refresh_rate(0)
+	if display_refresh_rate <= 0.0:
 		display_refresh_rate = 60.0
 
 func _load_license_data() -> void:

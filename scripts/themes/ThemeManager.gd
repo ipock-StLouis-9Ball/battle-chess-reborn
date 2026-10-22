@@ -85,7 +85,7 @@ func get_piece_theme(theme_id: String = "") -> PieceTheme:
 		var path = THEME_RESOURCE_PATHS[tid]
 		if ResourceLoader.exists(path):
 			var res = load(path)
-			if res is PieceTheme:
+			if res != null:
 				cached_piece_themes[tid] = res
 				return res
 

@@ -37,7 +37,10 @@ func start_cinematic_duel(attacker: Dictionary, victim: Dictionary, board_world_
 	# 2. Lookup KillMatrix data
 	var atk_type = attacker.get("type", "P")
 	var vic_type = victim.get("type", "P")
-	active_duel_data = KillMatrix.get_duel_animation(active_theme, atk_type, vic_type)
+	if has_node("/root/KillMatrix"):
+		active_duel_data = get_node("/root/KillMatrix").get_duel_animation(active_theme, atk_type, vic_type)
+	else:
+		active_duel_data = {"duration": 2.5, "impact_time": 1.2, "narrative": "Combat engaged!"}
 
 	var camera_angle = active_duel_data.get("camera_angle", "cinematic_action_tracking")
 	var duration = active_duel_data.get("duration", 2.5)
